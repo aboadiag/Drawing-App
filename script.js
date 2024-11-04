@@ -7,6 +7,7 @@ $(function(){
 
     var container=$("#container");
 
+    
     var mouse={x:0,y:0};
 
     //onload load saved work from localStorage
