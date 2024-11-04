@@ -28,7 +28,7 @@ app.post('/logUserAction', (req, res) => {
     console.log(`Received Action: ${action} at ${timestamp}`);
 
     // Insert the log into the MongoDB collection
-    db.collection('actions').insertOne({ action, timestamp, additionalData })
+    db.collection('DataCollections').insertOne({ action, timestamp, additionalData })
         .then(result => {
             res.status(200).send({ message: "Action logged successfully" });
         })
