@@ -4,11 +4,43 @@ $(function(){
     var paint_erase="paint";
     var canvas=document.getElementById("paint");
     var ctx=canvas.getContext("2d");
-
     var container=$("#container");
-
-
     var mouse={x:0,y:0};
+
+    // Function to log user actions
+    function logUserAction(action, additionalData = {}) {
+        const timestamp = new Date().toISOString();
+        
+        fetch("http://localhost:3000/logUserAction", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                action: action,
+                timestamp: timestamp,
+                additionalData: additionalData // Any extra data you want to log
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Data sent successfully:", data);
+        })
+        .catch(error => {
+            console.error("Error sending data:", error);
+        });
+    }
+    
+    // function logUserAction(action) {
+    //     console.log(`Action: ${action}, Timestamp: ${new Date().toISOString()}`);
+    //     // You can send this data to your server if needed
+    //     $.post("/logUserAction", { action: action });
+    // }
 
     //onload load saved work from localStorage
     if(localStorage.getItem("imgCanvas")!=null){
@@ -31,6 +63,8 @@ $(function(){
         mouse.x=e.pageX-this.offsetLeft;
         mouse.y=e.pageY-this.offsetTop;
         ctx.moveTo(mouse.x,mouse.y);
+        // log action
+        logUserAction("Start Drawing", { x: mouse.x, y: mouse.y });
     });
     container.mousemove(function(e){
         mouse.x=e.pageX-this.offsetLeft;
@@ -39,13 +73,13 @@ $(function(){
             if(paint_erase=="paint"){
             //get color input
             ctx.strokeStyle=$("#paintColor").val();
-            var pageCoords = "( " + mouse.x + ", " + mouse.y + " )";
-            console.log(pageCoords);
+            // var pageCoords = "( " + mouse.x + ", " + mouse.y + " )";
+            // console.log(pageCoords);
         }else{
             //white color
             ctx.strokeStyle="white"
-            var pageCoords = "( " + mouse.x + ", " + mouse.y + " )";
-            console.log(pageCoords);
+            // var pageCoords = "( " + mouse.x + ", " + mouse.y + " )";
+            // console.log(pageCoords);
         }
         ctx.lineTo(mouse.x,mouse.y);
         ctx.stroke();
@@ -60,6 +94,8 @@ $(function(){
     // });
     container.mouseup(function(){
        paint=false
+       //log user action
+       logUserAction("Stop Drawing");
     });
     container.mouseleave (function(){
         paint=false
@@ -71,13 +107,16 @@ $(function(){
 
          paint_erase="paint";
          $("#erase").removeClass("eraseMode");
-
+         // log user action
+         logUserAction("Reset Canvas");
      });
 
      //save button
      $("#save").click(function(){
          if(typeof(localStorage)!=null){
              localStorage.setItem("imgCanvas",canvas.toDataURL());
+             //log user action:
+             logUserAction("Canvas Saved");
          }
          else{
              window.alert("Your browser does not support local storage");
@@ -89,6 +128,8 @@ $(function(){
      $("#erase").click(function(){
          if(paint_erase=="paint"){
              paint_erase="erase";
+             //log user action:
+             logUserAction(paint_erase == "erase" ? "Switched to Erase" : "Switched to Paint");
             
          }
          else{
@@ -102,7 +143,8 @@ $(function(){
      //Change color input
      $("#paintColor").change(function(){
          $("#circle").css("background-color",$(this).val());
-
+         //log user action:
+         logUserAction(`Changed Color to ${$(this).val()}`);
      });
 
      //change linewidth using slider
@@ -113,6 +155,7 @@ $(function(){
             $("#circle").height(ui.value);
             $("#circle").width(ui.value);
             ctx.lineWidth=ui.value;
+            logUserAction(`Changed Line Width to ${ui.value}`);
             
         }
     });
