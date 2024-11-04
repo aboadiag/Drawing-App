@@ -7,8 +7,12 @@ const PORT = process.env.PORT || 3000;
 const mongoUrl = 'mongodb://localhost:27017'; // Adjust if necessary
 const dbName = 'userLogsDB';
 
+// allow to receive requests from my front end hosted at netlify.app:
+app.use(cors({
+    origin: 'https://drawingisfun.netlify.app' // Allow requests from your frontend URL
+}));
+
 app.use(express.json());
-app.use(cors());
 
 let db;
 
@@ -39,10 +43,6 @@ app.post('/logUserAction', (req, res) => {
         });
 });
 
-// allow to receive requests from my front end hosted at netlify.app:
-app.use(cors({
-    origin: 'https://drawingisfun.netlify.app' // Allow requests from your frontend URL
-}));
 
 // Allow fetching logged user actions
 app.get('/getUserActions', (req, res) => {
