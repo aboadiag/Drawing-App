@@ -46,6 +46,13 @@ $(function(){
         ctx.stroke();
     }
     });
+
+    // store mouse movements:
+    document.onmousemove = function(e){
+        var pageCoords = "( " + e.pageX + ", " + e.pageY + " )";
+        console.log(pageCoords);
+      };
+
     container.mouseup(function(){
        paint=false
     });
