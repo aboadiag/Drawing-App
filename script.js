@@ -7,7 +7,7 @@ $(function(){
 
     var container=$("#container");
 
-    
+
     var mouse={x:0,y:0};
 
     //onload load saved work from localStorage
@@ -47,13 +47,6 @@ $(function(){
         ctx.stroke();
     }
     });
-
-    // store mouse movements:
-    document.onmousemove(function(e){
-        var pageCoords = "( " + e.pageX + ", " + e.pageY + " )";
-        console.log(pageCoords);
-    });
-
     container.mouseup(function(){
        paint=false
     });
@@ -114,3 +107,11 @@ $(function(){
     });
     
 });
+
+
+
+    // // store mouse movements:
+    // document.onmousemove(function(e){
+    //     var pageCoords = "( " + e.pageX + ", " + e.pageY + " )";
+    //     console.log(pageCoords);
+    // });
