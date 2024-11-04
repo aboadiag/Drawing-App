@@ -1,7 +1,7 @@
 /*Center all elements and add background imgage*/
 body{
     text-align: center;
-    background: url(images/blank_backgrouns.jpg) center center fixed;
+    background: url(images/blank_background.jpg) center center fixed;
     background-size: cover;
 }
 /*Title*/
