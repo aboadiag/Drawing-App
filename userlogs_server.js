@@ -30,6 +30,7 @@ app.post('/logUserAction', (req, res) => {
     // Insert the log into the MongoDB collection
     db.collection('DataCollections').insertOne({ action, timestamp, additionalData })
         .then(result => {
+            console.log("Insert successful:", result);
             res.status(200).send({ message: "Action logged successfully" });
         })
         .catch(error => {

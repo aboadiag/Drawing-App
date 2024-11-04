@@ -10,17 +10,19 @@ $(function(){
     // Function to log user actions
     function logUserAction(action, additionalData = {}) {
         const timestamp = new Date().toISOString();
+
+        const logData = {
+            action: action,
+            timestamp: timestamp,
+            additionalData: additionalData
+        };
         
         fetch("http://localhost:3000/logUserAction", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                action: action,
-                timestamp: timestamp,
-                additionalData: additionalData // Any extra data you want to log
-            })
+            body: JSON.stringify(logData)
         })
         .then(response => {
             if (!response.ok) {
