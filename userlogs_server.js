@@ -39,6 +39,11 @@ app.post('/logUserAction', (req, res) => {
         });
 });
 
+// allow to receive requests from my front end hosted at netlify.app:
+app.use(cors({
+    origin: 'https://drawingisfun.netlify.app' // Allow requests from your frontend URL
+}));
+
 // Allow fetching logged user actions
 app.get('/getUserActions', (req, res) => {
     db.collection('actions').find({}).toArray()
