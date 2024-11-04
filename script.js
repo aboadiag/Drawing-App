@@ -17,7 +17,7 @@ $(function(){
             additionalData: additionalData
         };
         
-        fetch("http://localhost:3000/logUserAction", {
+        fetch("http://drawingisfun.netlify.app//logUserAction", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -66,7 +66,7 @@ $(function(){
         mouse.y=e.pageY-this.offsetTop;
         ctx.moveTo(mouse.x,mouse.y);
         // log action
-        logUserAction("Start Drawing", { x: mouse.x, y: mouse.y });
+        logUserAction("Start Drawing");
     });
     container.mousemove(function(e){
         mouse.x=e.pageX-this.offsetLeft;
