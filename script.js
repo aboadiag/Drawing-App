@@ -39,14 +39,25 @@ $(function(){
             if(paint_erase=="paint"){
             //get color input
             ctx.strokeStyle=$("#paintColor").val();
+            var pageCoords = "( " + mouse.x + ", " + mouse.y + " )";
+            console.log(pageCoords);
         }else{
             //white color
             ctx.strokeStyle="white"
+            var pageCoords = "( " + mouse.x + ", " + mouse.y + " )";
+            console.log(pageCoords);
         }
         ctx.lineTo(mouse.x,mouse.y);
         ctx.stroke();
     }
     });
+    
+    //store mouse movements:
+    // // store mouse movements:
+    // document.onmousemove(function(e){
+    //     var pageCoords = "( " + e.pageX + ", " + e.pageY + " )";
+    //     console.log(pageCoords);
+    // });
     container.mouseup(function(){
        paint=false
     });
@@ -109,9 +120,3 @@ $(function(){
 });
 
 
-
-    // // store mouse movements:
-    // document.onmousemove(function(e){
-    //     var pageCoords = "( " + e.pageX + ", " + e.pageY + " )";
-    //     console.log(pageCoords);
-    // });
