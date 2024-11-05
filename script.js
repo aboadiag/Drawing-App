@@ -17,7 +17,7 @@ $(function(){
             additionalData: additionalData
         };
         
-        fetch("http://drawingisfun.netlify.app/logUserAction", {
+        fetch("http://drawingisfun.netlify.app/.netlify/functions/logUserAction", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
