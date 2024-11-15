@@ -1,5 +1,5 @@
 $(function(){
-    const BASE_URL = "https://2436-34-82-217-190.ngrok-free.app"; // dynamic public url! CHANGE EVERYTIME NGROK RESTARTS!
+    const BASE_URL = "https://2436-34-82-217-190.ngrok-free.app"; // changed? dynamic public url! CHANGE EVERYTIME NGROK RESTARTS!
     // "https://fd09-34-82-217-190.ngrok-free.app";
     var paint=false;
     var paint_erase="paint";
