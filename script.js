@@ -1,5 +1,6 @@
 $(function(){
-    
+    const BASE_URL = "https://mutual-suitably-cricket.ngrok-free.app"; // static url
+    // "https://fd09-34-82-217-190.ngrok-free.app";
     var paint=false;
     var paint_erase="paint";
     var canvas=document.getElementById("paint");
@@ -17,7 +18,7 @@ $(function(){
             additionalData: additionalData
         };
         
-        fetch("https://fd09-34-82-217-190.ngrok-free.app/logDrawingData", {  // Use the ngrok URL here
+        fetch("${BASE_URL}/logDrawingData", {  // Use the ngrok URL here
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
