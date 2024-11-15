@@ -18,7 +18,7 @@ $(function(){
             additionalData: additionalData
         };
         
-        fetch("${BASE_URL}/logDrawingData", {  // Use the ngrok URL here
+        fetch(`${BASE_URL}/logDrawingData`, {  // Use the ngrok URL here
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
