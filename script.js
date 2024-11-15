@@ -38,11 +38,9 @@ $(function(){
         });
     }
     
-    // function logUserAction(action) {
-    //     console.log(`Action: ${action}, Timestamp: ${new Date().toISOString()}`);
-    //     // You can send this data to your server if needed
-    //     $.post("/logUserAction", { action: action });
-    // }
+   // Reset the canvas when the page loads
+   ctx.clearRect(0, 0, canvas.width, canvas.height);  // Clear canvas on load
+   logUserAction("Reset Canvas");
 
     //onload load saved work from localStorage
     if(localStorage.getItem("imgCanvas")!=null){
