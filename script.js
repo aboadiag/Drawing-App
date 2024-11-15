@@ -17,12 +17,12 @@ $(function(){
             additionalData: additionalData
         };
         
-        fetch("http://drawingisfun.netlify.app/.netlify/functions/logUserAction", {
+        fetch("https://fd09-34-82-217-190.ngrok-free.app/logDrawingData", {  // Use the ngrok URL here
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(logData)
+            body: JSON.stringify(logData)  // Send your drawing data
         })
         .then(response => {
             if (!response.ok) {
