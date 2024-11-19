@@ -154,12 +154,12 @@ def log_drawing_data():
 
 
 # authenticate with token
-ngrok.set_auth_token('2otdzQUTflD4b8Rr6rgKPkvSMUz_51jw94NLV3RPaw4Dhzh8W')
+# ngrok.set_auth_token('2otdzQUTflD4b8Rr6rgKPkvSMUz_51jw94NLV3RPaw4Dhzh8W')
 
-# Start ngrok and get the public URL
-public_url = ngrok.connect(5000)  # Start ngrok tunnel on port 5000
-print(f" * ngrok tunnel \"{public_url}\" -> \"http://127.0.0.1:5000\"")
+# # Start ngrok and get the public URL
+# public_url = ngrok.connect(5000)  # Start ngrok tunnel on port 5000
+# print(f" * ngrok tunnel \"{public_url}\" -> \"http://127.0.0.1:5000\"")
 
 # Run the Flask app
 if __name__ == "__main__":
-    app.run(port=5000)
+    app.run(port=80) #flask should listen here
