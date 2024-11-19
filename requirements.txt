@@ -1,0 +1,7 @@
+Flask==2.0.3
+requests==2.26.0
+numpy==1.24.3  # Or any other compatible version (for Python 3.11.9)
+pyngrok==5.1.0
+bayesianbandits==0.2.0
+mistyPy==0.0.4
+flask-cors==5.0.0
