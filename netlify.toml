@@ -6,5 +6,5 @@
 
 [[redirects]]
   from = "/logDrawingData"  # URL to call the function
-  to = "/.netlify/functions/logDrawingData"  # Path to the Flask function
+  to = "/.netlify/functions/misty_bandit"  # Path to the Flask function
   status = 200

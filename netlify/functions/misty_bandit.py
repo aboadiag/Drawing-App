@@ -172,32 +172,46 @@ def log_drawing_data():
             return jsonify({"status": "success", "message": "Action processed and LED color updated"}), 200
         
             # -------------------------- Send request to Misty to change LED color ---------------------------------------
-
+            #delay to give enough time for speaking request
             time.sleep(10)
             # ---------------------------------- Send request to Misty to speak ----------------------------------------
-            # try:
-            #     speech_response = requests.post(f"{MISTY_URL}tts/speak",
-            #         headers={"Content-Type": "application/json"},
-            #         data=json.dumps(speech_data))
+            try:
+                speech_response = requests.post(f"{MISTY_URL}tts/speak",
+                    headers={"Content-Type": "application/json"},
+                    data=json.dumps(speech_data))
 
-            #     if speech_response.status_code == 200:
-            #         print("Speech request sent successfully")
-            #         print(speech_response.json())  # Print response from Misty (optional)
-            #     else:
-            #         print(f"Error sending speech: {speech_response.status_code}")
+                if speech_response.status_code == 200:
+                    print("Speech request sent successfully")
+                    print(speech_response.json())  # Print response from Misty (optional)
+                else:
+                    print(f"Error sending speech: {speech_response.status_code}")
 
-            # #timeout exception        
-            # except requests.exceptions.Timeout:
-            #     print("Timeout occurred while trying to connect to Misty")
-            #     return jsonify({"status": "error", "message": "Timeout error while connecting to Misty"}), 500
+            #timeout exception        
+            except requests.exceptions.Timeout:
+                print("Timeout occurred while trying to connect to Misty")
+                return jsonify({"status": "error", "message": "Timeout error while connecting to Misty"}), 500
 
-            # #failure to send request request
-            # except requests.exceptions.RequestException as e:
-            #     print(f"Error making request: {e}")
-            #     return jsonify({"status": "error", "message": str(e)}), 500
+            #failure to send request request
+            except requests.exceptions.RequestException as e:
+                print(f"Error making request: {e}")
+                return jsonify({"status": "error", "message": str(e)}), 500
 
-            # return jsonify({"status": "success", "message": "Action processed and LED color updated"}), 200
+            return jsonify({"status": "success", "message": "Action processed and LED color updated"}), 200
         # ---------------------------------- Send request to Misty to speak ----------------------------------------
+
+    
+    except Exception as e:
+        print(f"Error processing data: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+# Run the Flask app
+if __name__ == "__main__":
+    app.run(port=80) #flask should listen here
+
+
+################ DRAFTS ############################
+
 
     #timeout exception        
     # except requests.exceptions.Timeout:
@@ -208,19 +222,11 @@ def log_drawing_data():
     # except requests.exceptions.RequestException as e:
     #     print(f"Error making request: {e}")
     #     return jsonify({"status": "error", "message": str(e)}), 500
+
     
-    except Exception as e:
-        print(f"Error processing data: {e}")
-        return jsonify({"status": "error", "message": str(e)}), 500
-
-
 # authenticate with token
 # ngrok.set_auth_token('2otdzQUTflD4b8Rr6rgKPkvSMUz_51jw94NLV3RPaw4Dhzh8W')
 
 # # Start ngrok and get the public URL
 # public_url = ngrok.connect(5000)  # Start ngrok tunnel on port 5000
 # print(f" * ngrok tunnel \"{public_url}\" -> \"http://127.0.0.1:5000\"")
-
-# Run the Flask app
-if __name__ == "__main__":
-    app.run(port=80) #flask should listen here
