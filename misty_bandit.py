@@ -26,7 +26,7 @@ user_data = []
 
 # Track interaction history (for the aggregate interactivity)
 interaction_history = deque()  # Store timestamps and interactivity scores (1 or 0)
-TIME_WINDOW = 60  # In seconds (e.g., track last 60 seconds of interactions)
+TIME_WINDOW = 20  # In seconds (e.g., track last 60 seconds of interactions)
 MAX_HISTORY_LENGTH = 100  # Limit the length of the deque to avoid excessive memory usag
 
 # Define the two personalities
@@ -39,12 +39,14 @@ arms = [
     Arm(1, learner=NormalInverseGammaRegressor())   # Arm for Uncharismatic (action 1)
 ]
 
+# Timestamp to track the last personality change
+last_personality_change_time = 0
 
 # Initialize the Agent with ThompsonSampling policy
 agent = Agent(arms, ThompsonSampling(), random_seed=0)
 
-# Set the time window in seconds (e.g., 60 seconds)
-TIME_WINDOW = 60
+# # Set the time window in seconds (e.g., 60 seconds)
+# TIME_WINDOW = 60
 
 # Initialize interaction history as an empty deque
 # Each entry in the deque will be a tuple (timestamp_seconds, interaction_value)
@@ -56,9 +58,14 @@ def calculate_aggregate_interactivity(timestamp_seconds):
     while interaction_history and timestamp_seconds - interaction_history[0][0] > TIME_WINDOW:
         interaction_history.popleft() # The popleft() method in Python is used to remove and return the first element (leftmost) from a deque object.
 
-    # Sum the interaction values (1 or 0) in the time window
-    total_interaction = sum([score for _, score in interaction_history])
-    return total_interaction
+   # Calculate the average of the interaction values (1 or 0) in the time window
+    if len(interaction_history) > 0:
+        total_interaction = sum([score for _, score in interaction_history])
+        average_interactivity = total_interaction / len(interaction_history)  # Average interactivity
+    else:
+        average_interactivity = 0  # If no interactions in the window, return 0
+    
+    return average_interactivity
 
 # Helper function to convert timestamp to seconds since the epoch
 def convert_timestamp_to_seconds(timestamp_str):
@@ -69,6 +76,8 @@ def convert_timestamp_to_seconds(timestamp_str):
 # Define the route for logging user data
 @app.route('/logDrawingData', methods=['POST'])
 def log_drawing_data():
+    global last_personality_change_time  # Reference to the global variable
+
     try:
         data = request.json
         action = data.get("action")
@@ -110,78 +119,96 @@ def log_drawing_data():
         # Update the agent with the action's reward (user interaction: 0 or 1)
         agent.update(np.array([aggregate_interactivity]))  # Using the 'update' method to update the agent
 
-        # Select an action (personality) based on the current policy
-        chosen_action = agent.pull()[0]  # Pull the selected action (this selects an arm)
+        print("timestamp_seconds f{timestamp_seconds}")
 
-        print(f"Chosen Action: {chosen_action}")
+        # Only change personality once every TIME_WINDOW
+        if timestamp_seconds - last_personality_change_time >= TIME_WINDOW:
 
-        # Change Misty's LED color based on the chosen action
-        if chosen_action == 0:
-            # Charismatic Personality (LED color blue)
-            led_data = {"red": 0, "green": 0, "blue": 255}
-            speech_data = {"text": "Please continue drawing for a few more seconds."}
-            print("Switching to Charismatic personality. LED color: Blue, Speech: Direct")
+            # Select an action (personality) based on the current policy
+            chosen_action = agent.pull()[0]  # Pull the selected action (this selects an arm)
 
-        else:
-            # Uncharismatic Personality (Indirect requests, No eye contact, No gestures)
-            led_data = {"red": 0, "green": 255, "blue": 0}
-            speech_data = {"text": "Maybe you could continue drawing?"}
-            print("Switching to Uncharismatic personality. LED color: Green, Speech: Indirect")
+            print(f"Chosen Action: {chosen_action}")
+            last_personality_change_time = timestamp_seconds  # Update the last personality change time
+            print("last personality change at f{last_personality_change_time}")
 
-        # -------------------------- Send request to Misty to change LED color ---------------------------------------
-        try:
-            # response = requests.post(MISTY_URL + 'led', json=led_data)
-            response = requests.post(f"{MISTY_URL}led",
-                headers={"Content-Type": "application/json"},
-                data=json.dumps(led_data))
-             
-            if response.status_code == 200:
-                print("LED color changed successfully")
-                print(response.json())  # Print response from Misty (optional)
+            # Change Misty's LED color based on the chosen action
+            if chosen_action == 0:
+                # Charismatic Personality (LED color blue)
+                led_data = {"red": 0, "green": 0, "blue": 255}
+                speech_data = {"text": "Please continue drawing for a few more seconds."}
+                print("Switching to Charismatic personality. LED color: Blue, Speech: Direct")
+
             else:
-                print(f"Error: {response.status_code}")
-                return jsonify({"status": "error", "message": f"LED change failed with status code {response.status_code}"}), 500
+                # Uncharismatic Personality (Indirect requests, No eye contact, No gestures)
+                led_data = {"red": 0, "green": 255, "blue": 0}
+                speech_data = {"text": "Maybe you could continue drawing?"}
+                print("Switching to Uncharismatic personality. LED color: Green, Speech: Indirect")
+
+            # -------------------------- Send request to Misty to change LED color ---------------------------------------
+            try:
+                # response = requests.post(MISTY_URL + 'led', json=led_data)
+                response = requests.post(f"{MISTY_URL}led",
+                    headers={"Content-Type": "application/json"},
+                    data=json.dumps(led_data))
+                
+                if response.status_code == 200:
+                    print("LED color changed successfully")
+                    print(response.json())  # Print response from Misty (optional)
+                else:
+                    print(f"Error: {response.status_code}")
+                    return jsonify({"status": "error", "message": f"LED change failed with status code {response.status_code}"}), 500
 
 
-        #timeout exception        
-        except requests.exceptions.Timeout:
-            print("Timeout occurred while trying to connect to Misty")
-            return jsonify({"status": "error", "message": "Timeout error while connecting to Misty"}), 500
+            #timeout exception        
+            except requests.exceptions.Timeout:
+                print("Timeout occurred while trying to connect to Misty")
+                return jsonify({"status": "error", "message": "Timeout error while connecting to Misty"}), 500
 
-        #failure to send request request
-        except requests.exceptions.RequestException as e:
-            print(f"Error making request: {e}")
-            return jsonify({"status": "error", "message": str(e)}), 500
+            #failure to send request request
+            except requests.exceptions.RequestException as e:
+                print(f"Error making request: {e}")
+                return jsonify({"status": "error", "message": str(e)}), 500
 
-        return jsonify({"status": "success", "message": "Action processed and LED color updated"}), 200
-    
-        # -------------------------- Send request to Misty to change LED color ---------------------------------------
+            return jsonify({"status": "success", "message": "Action processed and LED color updated"}), 200
+        
+            # -------------------------- Send request to Misty to change LED color ---------------------------------------
 
+            time.sleep(10)
+            # ---------------------------------- Send request to Misty to speak ----------------------------------------
+            # try:
+            #     speech_response = requests.post(f"{MISTY_URL}tts/speak",
+            #         headers={"Content-Type": "application/json"},
+            #         data=json.dumps(speech_data))
+
+            #     if speech_response.status_code == 200:
+            #         print("Speech request sent successfully")
+            #         print(speech_response.json())  # Print response from Misty (optional)
+            #     else:
+            #         print(f"Error sending speech: {speech_response.status_code}")
+
+            # #timeout exception        
+            # except requests.exceptions.Timeout:
+            #     print("Timeout occurred while trying to connect to Misty")
+            #     return jsonify({"status": "error", "message": "Timeout error while connecting to Misty"}), 500
+
+            # #failure to send request request
+            # except requests.exceptions.RequestException as e:
+            #     print(f"Error making request: {e}")
+            #     return jsonify({"status": "error", "message": str(e)}), 500
+
+            # return jsonify({"status": "success", "message": "Action processed and LED color updated"}), 200
         # ---------------------------------- Send request to Misty to speak ----------------------------------------
-        try:
-            speech_response = requests.post(f"{MISTY_URL}tts/speak",
-                headers={"Content-Type": "application/json"},
-                data=json.dumps(speech_data))
 
-            if speech_response.status_code == 200:
-                print("Speech request sent successfully")
-                print(speech_response.json())  # Print response from Misty (optional)
-            else:
-                print(f"Error sending speech: {speech_response.status_code}")
+    #timeout exception        
+    # except requests.exceptions.Timeout:
+    #     print("Timeout occurred while trying to connect to Misty")
+    #     return jsonify({"status": "error", "message": "Timeout error while connecting to Misty"}), 500
 
-        #timeout exception        
-        except requests.exceptions.Timeout:
-            print("Timeout occurred while trying to connect to Misty")
-            return jsonify({"status": "error", "message": "Timeout error while connecting to Misty"}), 500
-
-        #failure to send request request
-        except requests.exceptions.RequestException as e:
-            print(f"Error making request: {e}")
-            return jsonify({"status": "error", "message": str(e)}), 500
-
-        return jsonify({"status": "success", "message": "Action processed and LED color updated"}), 200
-     # ---------------------------------- Send request to Misty to speak ----------------------------------------
-
+    # #failure to send request request
+    # except requests.exceptions.RequestException as e:
+    #     print(f"Error making request: {e}")
+    #     return jsonify({"status": "error", "message": str(e)}), 500
+    
     except Exception as e:
         print(f"Error processing data: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
