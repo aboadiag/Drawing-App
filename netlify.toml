@@ -1,4 +1,4 @@
 [build]
   # Set the build environment to Python 3.11.9 (you can change it if necessary)
-  python_version = "3.11.9"
+  python_version = "3.11"
 
