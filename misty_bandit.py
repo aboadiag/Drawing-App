@@ -93,7 +93,12 @@ def log_drawing_data():
         ]
 
         # Assume 'Start Drawing' means interaction, 'Stop Drawing' means no interaction
-        interaction_value = 1 if action in ["Start Drawing", "Switched to Paint", "Changed Color"] else 0
+        if action in ["Start Drawing", "Switched to Paint", "Changed Color",
+                                            "Switched to Erase", "Canvas Saved"]:
+            interaction_value = 1 
+        
+        elif action in ["Stop Drawing", "Reset Canvas"]:
+            interaction_value = 0 
 
         # Track the interaction with the current timestamp
         interaction_history.append((timestamp_seconds, interaction_value))
@@ -118,7 +123,7 @@ def log_drawing_data():
 
         else:
             # Uncharismatic Personality (Indirect requests, No eye contact, No gestures)
-            led_data = {"red": 255, "green": 0, "blue": 0}
+            led_data = {"red": 0, "green": 255, "blue": 0}
             print("Switching to Uncharismatic personality. LED color: Red")
 
         # Send request to Misty to change LED color
