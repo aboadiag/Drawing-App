@@ -162,4 +162,4 @@ def log_drawing_data():
 
 # Run the Flask app
 if __name__ == "__main__":
-    app.run(port=5000) #flask should listen here
+    app.run(port=80) #flask should listen here
