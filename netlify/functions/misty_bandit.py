@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from pyngrok import ngrok
 from bayesianbandits import Arm, NormalInverseGammaRegressor, Agent, ThompsonSampling, UpperConfidenceBound
-from generate_tts import generate_tts
+from gtts import gTTS
 import os
 import numpy as np
 import time
@@ -22,8 +22,8 @@ LOCAL_SERVER_PORT = 8000
 
 # Speech file names
 speech = {
-    "char_s1": "misty_char1.mp3",
-    "uncahr_s1": "misty_unchar1.mp3",
+    "char_s1": f"{AUDIO_FILES_DIR}/misty_char1.mp3",
+    "uncahr_s1": f"{AUDIO_FILES_DIR}/misty_unchar1.mp3",
 }
 
 # Misty API endpoints
@@ -41,6 +41,71 @@ CORS(app)
 @app.route('/misty_audio_files/<filename>')
 def serve_audio(filename):
     return send_from_directory(AUDIO_FILES_DIR, filename)
+
+######################################## MISTY HELPER FUNCTIONS ######################################################
+#Playing new audio files:
+def play_audio_on_misty(file_path, volume=DEFAULT_VOLUME):
+    """Send a POST request to Misty to play audio."""
+    try:
+        # Construct the file URL served by the local server
+        filename = os.path.basename(file_path)
+        file_url = f"http://{LOCAL_SERVER_IP}:{LOCAL_SERVER_PORT}/{AUDIO_FILES_DIR}/{filename}"
+        
+        # Send the request
+        response = requests.post(
+            audio_url,
+            headers={"Content-Type": "application/json"},
+            json={
+                "FileName": file_url,
+                "Volume": DEFAULT_VOLUME
+            }
+        )
+        if response.status_code == 200:
+            print("Audio played successfully on Misty.")
+        else:
+            print(f"Error playing audio on Misty: {response.status_code} - {response.text}")
+
+                #timeout exception        
+    except requests.exceptions.Timeout:
+        print("Timeout occurred while trying to connect to Misty")
+        return jsonify({"status": "error", "message": "Timeout error while connecting to Misty"}), 500
+
+    #failure to send request request
+    except requests.exceptions.RequestException as e:
+        print(f"Error making request: {e}")
+        return jsonify({"status": "error", "message": f"Error playing audio on Misty: {str(e)}"}), 500
+
+    return jsonify({"status": "success", "message": "Audio file received and played sucessfully"}), 200
+
+def change_led_on_misty(led_data):
+    try:
+        # response = requests.post(MISTY_URL + 'led', json=led_data)
+        response = requests.post(
+            led_url,
+            headers={"Content-Type": "application/json"},
+            data=json.dumps(led_data))
+        
+        if response.status_code == 200:
+            print("LED color changed successfully")
+            print(response.json())  # Print response from Misty (optional)
+        else:
+            print(f"Error: {response.status_code}")
+            return jsonify({"status": "error", "message": f"LED change failed with status code {response.status_code}"}), 500
+
+    #timeout exception        
+    except requests.exceptions.Timeout:
+        print("Timeout occurred while trying to connect to Misty")
+        return jsonify({"status": "error", "message": "Timeout error while connecting to Misty"}), 500
+
+    #failure to send request request
+    except requests.exceptions.RequestException as e:
+        print(f"Error making request: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+    return jsonify({"status": "success", "message": "Action processed and LED color updated"}), 200
+
+
+######################################## MISTY HELPER FUNCTIONS ######################################################
 
 # Data storage for logging purposes
 user_data = []
@@ -72,62 +137,6 @@ agent = Agent(arms, ThompsonSampling(), random_seed=0)
 # Initialize interaction history as an empty deque
 # Each entry in the deque will be a tuple (timestamp_seconds, interaction_value)
 interaction_history = deque()
-
-######################################## MISTY HELPER FUNCTIONS ######################################################
-#Playing new audio files:
-def play_audio_on_misty(file_path, volume=DEFAULT_VOLUME):
-    """Send a POST request to Misty to play audio."""
-    try:
-        # Construct the file URL served by the local server
-        filename = os.path.basename(file_path)
-        file_url = f"http://{LOCAL_SERVER_IP}:{LOCAL_SERVER_PORT}/{AUDIO_FILES_DIR}/{filename}"
-        
-        # Send the request
-        response = requests.post(
-            audio_url,
-            headers={"Content-Type": "application/json"},
-            json={
-                "FileName": file_url,
-                "Volume": DEFAULT_VOLUME
-            }
-        )
-        if response.status_code == 200:
-            print("Audio played successfully on Misty.")
-        else:
-            print(f"Error playing audio on Misty: {response.status_code} - {response.text}")
-    except requests.exceptions.RequestException as e:
-        print(f"Error playing audio on Misty: {e}")
-
-def change_led_on_misty(led_data):
-    try:
-        # response = requests.post(MISTY_URL + 'led', json=led_data)
-        response = requests.post(
-            led_url,
-            headers={"Content-Type": "application/json"},
-            data=json.dumps(led_data))
-        
-        if response.status_code == 200:
-            print("LED color changed successfully")
-            print(response.json())  # Print response from Misty (optional)
-        else:
-            print(f"Error: {response.status_code}")
-            return jsonify({"status": "error", "message": f"LED change failed with status code {response.status_code}"}), 500
-
-
-    #timeout exception        
-    except requests.exceptions.Timeout:
-        print("Timeout occurred while trying to connect to Misty")
-        return jsonify({"status": "error", "message": "Timeout error while connecting to Misty"}), 500
-
-    #failure to send request request
-    except requests.exceptions.RequestException as e:
-        print(f"Error making request: {e}")
-        return jsonify({"status": "error", "message": str(e)}), 500
-
-    return jsonify({"status": "success", "message": "Action processed and LED color updated"}), 200
-
-
-######################################## MISTY HELPER FUNCTIONS ######################################################
 
 # Define the route for logging user data
 @app.route('/logDrawingData', methods=['POST'])
@@ -175,7 +184,7 @@ def log_drawing_data():
         # Update the agent with the action's reward (user interaction: 0 or 1)
         agent.update(np.array([aggregate_interactivity]))  # Using the 'update' method to update the agent
 
-        print("timestamp_seconds f{timestamp_seconds}")
+        print(f"timestamp_seconds {timestamp_seconds}")
 
         # Only change personality once every TIME_WINDOW
         if timestamp_seconds - last_personality_change_time >= TIME_WINDOW:
@@ -185,7 +194,7 @@ def log_drawing_data():
 
             print(f"Chosen Action: {chosen_action}")
             last_personality_change_time = timestamp_seconds  # Update the last personality change time
-            print("last personality change at f{last_personality_change_time}")
+            print(f"last personality change at {last_personality_change_time}")
 
             # Change Misty's LED color based on the chosen action
             if chosen_action == 0:
@@ -196,7 +205,7 @@ def log_drawing_data():
                 #play audio on misty
                 speech_data  = speech["char_s1"]
                 # audio_pathname = f"{speech_data}/{AUDIO_FILES_DIR}"
-                print("charactersitic audio path: f{speech_data}")
+                print(f"charactersitic audio path: {speech_data}")
                 play_audio_on_misty(speech_data)
 
                 # speech_data = {"text": "Please continue drawing for a few more seconds."}
@@ -209,7 +218,7 @@ def log_drawing_data():
 
                 #play audio on misty
                 speech_data  = speech["unchar_s1"]
-                print("uncharactersitic audio path: f{speech_data}")
+                print(f"uncharactersitic audio path: {speech_data}")
                 play_audio_on_misty(speech_data)
                 # speech_data = {"text": "Maybe you could continue drawing?"}
 
@@ -217,7 +226,7 @@ def log_drawing_data():
     
     except Exception as e:
         print(f"Error processing data: {e}")
-        return jsonify({"status": "error", "message": str(e)}), 500
+        return jsonify({"status": "error", "message": f"An error occurred: {str(e)}"}), 500
 
 
 ######################################## BAYESIAN BANDIT HELPER FUNCTIONS ######################################################
@@ -248,7 +257,7 @@ def convert_timestamp_to_seconds(timestamp_str):
 
 # Run the Flask app
 if __name__ == "__main__":
-    app.run(port=80) #flask should listen here
+    app.run(debug=True, port=80) #flask should listen here
 
 
 ################ DRAFTS ############################
