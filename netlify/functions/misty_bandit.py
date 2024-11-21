@@ -228,6 +228,8 @@ def log_drawing_data():
         print(f"Error processing data: {e}")
         return jsonify({"status": "error", "message": f"An error occurred: {str(e)}"}), 500
 
+    # Add a valid return response at the end of the function
+    return jsonify({"status": "success", "message": "Drawing data logged successfully"}), 200
 
 ######################################## BAYESIAN BANDIT HELPER FUNCTIONS ######################################################
 
