@@ -17,8 +17,8 @@ MISTY_URL = "http://172.26.189.224"
 AUDIO_PLAY_ENDPOINT = "/api/audio/play"
 LED_ENDPOINT = "/api/led"
 AUDIO_FILES_DIR = "misty_audio_files"
-DEFAULT_VOLUME = 50
-LOCAL_SERVER_IP = "172.26.28.222"  # Replace with your local machine's IP address
+DEFAULT_VOLUME = 100
+LOCAL_SERVER_IP = "172.26.19.29"  # Replace with your local machine's IP address
 LOCAL_SERVER_PORT = 8000
 
 # Speech file names
@@ -38,11 +38,6 @@ app = Flask(__name__)
 # Enable CORS for all routes
 CORS(app)
 
-# Serve audio files from the 'misty_audio_files' directory as static files
-@app.route('/misty_audio_files/<filename>')
-def serve_audio(filename):
-    return send_from_directory(AUDIO_FILES_DIR, filename)
-
 ######################################## BAYESIAN BANDIT SET UP ######################################################
 # Data storage for logging purposes
 user_data = []
@@ -58,14 +53,17 @@ interactive = ["Start Drawing", "Switched to Paint", "Changed Color",
 not_interactive = ["Stop Drawing", "Reset Canvas"]
 
 
-# Track interaction history (for the aggregate interactivity)
 interaction_history = deque()  # Store timestamps and interactivity scores (1 or 0)
-TIME_WINDOW = 10  # Time window for interactivity level classification
+INTERACTIVITY_TIME_WINDOW  = 10  # Time window for interactivity level classification (in seconds)
+PERSONALITY_CHANGE_TIME_WINDOW = 30  # Time window for changing the personality (in seconds)
 
+
+# Track the last interaction time and last personality change time
+last_interactivity_update_time = 0  # Timestamp of the last interactivity update
+last_personality_change_time = 0  # Timestamp of the last personality change
 
 # Define the two personalities
 personalities = ["Charismatic", "Uncharismatic"]
-
 
 # Define Arms for Charismatic and Uncharismatic
 arms = [
@@ -73,8 +71,7 @@ arms = [
     Arm(1, learner=NormalInverseGammaRegressor())   # Arm for Uncharismatic (action 1)
 ]
 
-# Timestamp to track the last personality change
-last_personality_change_time = 0
+
 
 # Initialize the Agent with ThompsonSampling policy
 agent = Agent(arms, ThompsonSampling(), random_seed=0)
@@ -117,6 +114,7 @@ def log_to_csv(data):
 ######################################## MISTY HELPER FUNCTIONS ######################################################
 #Playing new audio files:
 def play_audio_on_misty(file_path, volume=DEFAULT_VOLUME):
+    print("playing audio on misty...")
     """Send a POST request to Misty to play audio."""
     try:
         # Construct the file URL served by the local server
@@ -150,6 +148,7 @@ def play_audio_on_misty(file_path, volume=DEFAULT_VOLUME):
     return jsonify({"status": "success", "message": "Audio file received and played sucessfully"}), 200
 
 def change_led_on_misty(led_data):
+    print("changing misty's led...")
     try:
         # response = requests.post(MISTY_URL + 'led', json=led_data)
         response = requests.post(
@@ -210,7 +209,7 @@ def convert_timestamp_to_seconds(timestamp_str):
 # Define the route for logging user data
 @app.route('/logDrawingData', methods=['POST'])
 def log_drawing_data():
-    global last_personality_change_time  # tracking when last personality change happened (should happen every TIME_WINDOW)
+    global last_interactivity_update_time, last_personality_change_time  # Track time for both windows
 
     try:
         data = request.json
@@ -235,29 +234,33 @@ def log_drawing_data():
         #save action and timestamp
         interaction_history.append((timestamp_seconds, action))
 
-        # Classify interactivity level
-        context = classify_interactivity_level(timestamp_seconds)
-        print(f"Interactivity Level: {context}")
+        # --- Interactivity Classification ---  
+        if timestamp_seconds - last_interactivity_update_time >= INTERACTIVITY_TIME_WINDOW:
 
-        # Select an action (personality) based on the current policy
-        chosen_action = agent.pull()[0]  # Pull the selected action (this selects an arm)
-        print(f"Chosen Action: {chosen_action}")
-        
-        last_personality_change_time = timestamp_seconds  # Update the last personality change time
-        print(f"last personality change at {last_personality_change_time}")
+            # Classify interactivity level
+            context = classify_interactivity_level(timestamp_seconds)
+            print(f"Interactivity Level: {context}")
+            last_interactivity_update_time = timestamp_seconds  # Update the time after classifying
 
-        # Only change personality if more than TIME_WINDOW seconds have passed
-        if timestamp_seconds - last_personality_change_time >= TIME_WINDOW:
-                
-            # Change Misty's LED color based on the chosen action
+
+        # --- Personality Change ---
+        # Only change personality if more than PERSONALITY_CHANGE_TIME_WINDOW seconds have passed
+        if timestamp_seconds - last_personality_change_time >= PERSONALITY_CHANGE_TIME_WINDOW:
+            print("Proceeding with personality change...") 
+
+            # Select an action (personality) based on the current policy
+            chosen_action = agent.pull()[0]  # Pull the selected action (this selects an arm)
+            print(f"Chosen Action: {chosen_action}")
+
+            # Change Misty's PERSONALITY/chosen action
             if chosen_action == 0:
+
                 # Charismatic Personality (LED color blue)
                 led_data = {"red": 0, "green": 0, "blue": 255}
                 change_led_on_misty(led_data)
 
                 #play audio on misty
                 speech_data  = speech["char_s1"]
-                # audio_pathname = f"{speech_data}/{AUDIO_FILES_DIR}"
                 print(f"charactersitic audio path: {speech_data}")
                 play_audio_on_misty(speech_data)
 
@@ -276,6 +279,9 @@ def log_drawing_data():
                 # speech_data = {"text": "Maybe you could continue drawing?"}
 
                 print("Switching to Uncharismatic personality. LED color: Green, Speech: Indirect")
+
+            last_personality_change_time = timestamp_seconds  # Update the last personality change time
+            print(f"last personality change at {last_personality_change_time}")
         
     except Exception as e:
         print(f"Error processing data: {e}")
@@ -287,6 +293,3 @@ def log_drawing_data():
 # Run the Flask app
 if __name__ == "__main__":
     app.run(debug=True, port=80) #flask should listen here
-
-
-################ DRAFTS ############################
