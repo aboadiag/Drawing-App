@@ -10,6 +10,7 @@ import requests
 import json
 from collections import deque
 from datetime import datetime
+import csv
 
 # Define constants
 MISTY_URL = "http://172.26.189.224"
@@ -23,7 +24,7 @@ LOCAL_SERVER_PORT = 8000
 # Speech file names
 speech = {
     "char_s1": f"{AUDIO_FILES_DIR}/misty_char1.mp3",
-    "uncahr_s1": f"{AUDIO_FILES_DIR}/misty_unchar1.mp3",
+    "unchar_s1": f"{AUDIO_FILES_DIR}/misty_unchar1.mp3",
 }
 
 # Misty API endpoints
@@ -41,6 +42,77 @@ CORS(app)
 @app.route('/misty_audio_files/<filename>')
 def serve_audio(filename):
     return send_from_directory(AUDIO_FILES_DIR, filename)
+
+######################################## BAYESIAN BANDIT SET UP ######################################################
+# Data storage for logging purposes
+user_data = []
+
+# Define the user interaction actions
+user_actions = [
+    "Reset Canvas", "Start Drawing", "Stop Drawing",
+    "Canvas Saved", "Switched to Erase", "Switched to Paint",
+    "Changed Color", "Changed Line Width"
+]
+interactive = ["Start Drawing", "Switched to Paint", "Changed Color",
+                                    "Switched to Erase", "Canvas Saved", "Changed Line Width"]
+not_interactive = ["Stop Drawing", "Reset Canvas"]
+
+
+# Track interaction history (for the aggregate interactivity)
+interaction_history = deque()  # Store timestamps and interactivity scores (1 or 0)
+TIME_WINDOW = 10  # Time window for interactivity level classification
+
+
+# Define the two personalities
+personalities = ["Charismatic", "Uncharismatic"]
+
+
+# Define Arms for Charismatic and Uncharismatic
+arms = [
+    Arm(0, learner=NormalInverseGammaRegressor()),  # Arm for Charismatic (action 0)
+    Arm(1, learner=NormalInverseGammaRegressor())   # Arm for Uncharismatic (action 1)
+]
+
+# Timestamp to track the last personality change
+last_personality_change_time = 0
+
+# Initialize the Agent with ThompsonSampling policy
+agent = Agent(arms, ThompsonSampling(), random_seed=0)
+
+# # Set the time window in seconds (e.g., 60 seconds)
+# TIME_WINDOW = 60
+
+# Initialize interaction history as an empty deque
+# Each entry in the deque will be a tuple (timestamp_seconds, interaction_value)
+interaction_history = deque()
+
+
+######################################## BAYESIAN BANDIT SET UP ######################################################
+
+######################################## USER INTERACTION DATA LOGGING #####################################################
+# Path to the CSV file
+CSV_LOG_PATH = "user_interactions.csv"
+#  Function to write data to CSV
+def log_to_csv(data):
+    """Log user interaction data to a CSV file."""
+    try:
+        file_exists = os.path.isfile(CSV_LOG_PATH)
+        with open(CSV_LOG_PATH, mode='a', newline='', encoding='utf-8') as file:
+            fieldnames = ['timestamp', 'action', 'interaction_value']
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+
+            # Write header if the file doesn't exist
+            if not file_exists:
+                writer.writeheader()
+
+            writer.writerow(data)
+        print(f"Logged data: {data}")
+    except Exception as e:
+        print(f"Error logging to CSV: {e}")
+
+######################################## USER INTERACTION DATA LOGGING #####################################################
+
+# -------------------------------------------- HELPER FUNCTIONS -----------------------------------------------------
 
 ######################################## MISTY HELPER FUNCTIONS ######################################################
 #Playing new audio files:
@@ -107,95 +179,76 @@ def change_led_on_misty(led_data):
 
 ######################################## MISTY HELPER FUNCTIONS ######################################################
 
-# Data storage for logging purposes
-user_data = []
+######################################## BAYESIAN BANDIT HELPER FUNCTIONS ######################################################
 
-# Track interaction history (for the aggregate interactivity)
-interaction_history = deque()  # Store timestamps and interactivity scores (1 or 0)
-TIME_WINDOW = 20  # In seconds (e.g., track last 60 seconds of interactions)
-MAX_HISTORY_LENGTH = 100  # Limit the length of the deque to avoid excessive memory usag
+# Function to classify the interaction context
+def classify_interactivity_level(timestamp_seconds):
+    recent_actions = [action for _, action in interaction_history]
 
-# Define the two personalities
-personalities = ["Charismatic", "Uncharismatic"]
+    # Count the number of "interactive" and "not interactive" actions
+    high_interactivity_count = sum([1 for action in recent_actions if action in interactive])
+    low_interactivity_count = sum([1 for action in recent_actions if action in not_interactive])
+
+    if high_interactivity_count >= 4:
+        return "high"  # High interactivity if 4 or more interactive actions
+    elif low_interactivity_count >= 4:
+        return "low"  # Low interactivity if 4 or more not interactive actions
+    else:
+        return "medium"  # Medium interactivity if it's a mix of both
 
 
-# Define Arms for Charismatic and Uncharismatic
-arms = [
-    Arm(0, learner=NormalInverseGammaRegressor()),  # Arm for Charismatic (action 0)
-    Arm(1, learner=NormalInverseGammaRegressor())   # Arm for Uncharismatic (action 1)
-]
+# Helper function to convert timestamp to seconds since the epoch
+def convert_timestamp_to_seconds(timestamp_str):
+    # Assuming the timestamp is in ISO8601 format (e.g., '2024-11-16T20:49:49.382Z')
+    timestamp = datetime.fromisoformat(timestamp_str.replace("Z", "+00:00"))  # Convert to datetime object
+    return timestamp.timestamp()  # Convert datetime to seconds since epoch
 
-# Timestamp to track the last personality change
-last_personality_change_time = 0
+######################################## BAYESIAN BANDIT HELPER FUNCTIONS ######################################################
 
-# Initialize the Agent with ThompsonSampling policy
-agent = Agent(arms, ThompsonSampling(), random_seed=0)
-
-# # Set the time window in seconds (e.g., 60 seconds)
-# TIME_WINDOW = 60
-
-# Initialize interaction history as an empty deque
-# Each entry in the deque will be a tuple (timestamp_seconds, interaction_value)
-interaction_history = deque()
+# -------------------------------------------- HELPER FUNCTIONS -----------------------------------------------------
 
 # Define the route for logging user data
 @app.route('/logDrawingData', methods=['POST'])
 def log_drawing_data():
-    global last_personality_change_time  # Reference to the global variable
+    global last_personality_change_time  # tracking when last personality change happened (should happen every TIME_WINDOW)
 
     try:
         data = request.json
         action = data.get("action")
         timestamp_str = data.get("timestamp")
-        # additional_data = data.get("additionalData", {})
-
-        # data received
         print(f"Received Action: {action} at {timestamp_str}")
-        
+
         # Convert the timestamp to seconds since the epoch
         timestamp_seconds = convert_timestamp_to_seconds(timestamp_str)
+   
+        # Assign rewards            
+        interaction_value = 1 if action in interactive else 0
 
-        #append to in-memory storage (for debug)
-        user_data.append(data)
-        print("Data received:", data)  # Print data for debugging purposes
-
-        # Define the user interaction actions
-        user_actions = [
-            "Reset Canvas", "Start Drawing", "Stop Drawing",
-            "Canvas Saved", "Switched to Erase", "Switched to Paint",
-            "Changed Color", "Changed Line Width"
-        ]
-
-        # Assume 'Start Drawing' means interaction, 'Stop Drawing' means no interaction
-        if action in ["Start Drawing", "Switched to Paint", "Changed Color",
-                                            "Switched to Erase", "Canvas Saved"]:
-            interaction_value = 1 
+        # Log the interaction data to CSV
+        log_data = {
+            'timestamp': timestamp_seconds,
+            'action': action,
+            'interaction_value': interaction_value
+        }
+        log_to_csv(log_data)
         
-        elif action in ["Stop Drawing", "Reset Canvas"]:
-            interaction_value = 0 
+        #save action and timestamp
+        interaction_history.append((timestamp_seconds, action))
 
-        # Track the interaction with the current timestamp
-        interaction_history.append((timestamp_seconds, interaction_value))
+        # Classify interactivity level
+        context = classify_interactivity_level(timestamp_seconds)
+        print(f"Interactivity Level: {context}")
 
-        # Calculate aggregate interactivity in the last TIME_WINDOW seconds
-        aggregate_interactivity = calculate_aggregate_interactivity(timestamp_seconds)
-        print(f"Aggregate Interactivity over last {TIME_WINDOW} seconds: {aggregate_interactivity}")
+        # Select an action (personality) based on the current policy
+        chosen_action = agent.pull()[0]  # Pull the selected action (this selects an arm)
+        print(f"Chosen Action: {chosen_action}")
+        
+        last_personality_change_time = timestamp_seconds  # Update the last personality change time
+        print(f"last personality change at {last_personality_change_time}")
 
-        # Update the agent with the action's reward (user interaction: 0 or 1)
-        agent.update(np.array([aggregate_interactivity]))  # Using the 'update' method to update the agent
-
-        print(f"timestamp_seconds {timestamp_seconds}")
-
-        # Only change personality once every TIME_WINDOW
+        # Only change personality if more than TIME_WINDOW seconds have passed
         if timestamp_seconds - last_personality_change_time >= TIME_WINDOW:
-
-            # Select an action (personality) based on the current policy
-            chosen_action = agent.pull()[0]  # Pull the selected action (this selects an arm)
-
-            print(f"Chosen Action: {chosen_action}")
-            last_personality_change_time = timestamp_seconds  # Update the last personality change time
-            print(f"last personality change at {last_personality_change_time}")
-
+                
             # Change Misty's LED color based on the chosen action
             if chosen_action == 0:
                 # Charismatic Personality (LED color blue)
@@ -223,7 +276,7 @@ def log_drawing_data():
                 # speech_data = {"text": "Maybe you could continue drawing?"}
 
                 print("Switching to Uncharismatic personality. LED color: Green, Speech: Indirect")
-    
+        
     except Exception as e:
         print(f"Error processing data: {e}")
         return jsonify({"status": "error", "message": f"An error occurred: {str(e)}"}), 500
@@ -231,88 +284,9 @@ def log_drawing_data():
     # Add a valid return response at the end of the function
     return jsonify({"status": "success", "message": "Drawing data logged successfully"}), 200
 
-######################################## BAYESIAN BANDIT HELPER FUNCTIONS ######################################################
-
-# Helper function to calculate aggregate interactivity using the interaction's timestamp
-def calculate_aggregate_interactivity(timestamp_seconds):
-    # Remove interactions older than the TIME_WINDOW from the history
-    while interaction_history and timestamp_seconds - interaction_history[0][0] > TIME_WINDOW:
-        interaction_history.popleft() # The popleft() method in Python is used to remove and return the first element (leftmost) from a deque object.
-
-   # Calculate the average of the interaction values (1 or 0) in the time window
-    if len(interaction_history) > 0:
-        total_interaction = sum([score for _, score in interaction_history])
-        average_interactivity = total_interaction / len(interaction_history)  # Average interactivity
-    else:
-        average_interactivity = 0  # If no interactions in the window, return 0
-    
-    return average_interactivity
-
-# Helper function to convert timestamp to seconds since the epoch
-def convert_timestamp_to_seconds(timestamp_str):
-    # Assuming the timestamp is in ISO8601 format (e.g., '2024-11-16T20:49:49.382Z')
-    timestamp = datetime.fromisoformat(timestamp_str.replace("Z", "+00:00"))  # Convert to datetime object
-    return timestamp.timestamp()  # Convert datetime to seconds since epoch
-
-######################################## BAYESIAN BANDIT HELPER FUNCTIONS ######################################################
-
-
 # Run the Flask app
 if __name__ == "__main__":
     app.run(debug=True, port=80) #flask should listen here
 
 
 ################ DRAFTS ############################
-
-        #     try:
-        #         speech_response = requests.post(f"{MISTY_URL}tts/speak",
-        #             headers={"Content-Type": "application/json"},
-        #             data=json.dumps(speech_data))
-
-        #         if speech_response.status_code == 200:
-        #             print("Speech request sent successfully")
-        #             print(speech_response.json())  # Print response from Misty (optional)
-        #         else:
-        #             print(f"Error sending speech: {speech_response.status_code}")
-
-        #     #timeout exception        
-        #     except requests.exceptions.Timeout:
-        #         print("Timeout occurred while trying to connect to Misty")
-        #         return jsonify({"status": "error", "message": "Timeout error while connecting to Misty"}), 500
-
-        #     #failure to send request request
-        #     except requests.exceptions.RequestException as e:
-        #         print(f"Error making request: {e}")
-        #         return jsonify({"status": "error", "message": str(e)}), 500
-
-        #     return jsonify({"status": "success", "message": "Action processed and LED color updated"}), 200
-        # # ---------------------------------- Send request to Misty to speak ----------------------------------------
-
-                    # -------------------------- Send request to Misty to change LED color ---------------------------------------
-
-        
-            # -------------------------- Send request to Misty to change LED color ---------------------------------------
-            # #delay to give enough time for speaking request
-            # time.sleep(10)
-            # ---------------------------------- Send request to Misty to speak ----------------------------------------
-
-
-
-
-    #timeout exception        
-    # except requests.exceptions.Timeout:
-    #     print("Timeout occurred while trying to connect to Misty")
-    #     return jsonify({"status": "error", "message": "Timeout error while connecting to Misty"}), 500
-
-    # #failure to send request request
-    # except requests.exceptions.RequestException as e:
-    #     print(f"Error making request: {e}")
-    #     return jsonify({"status": "error", "message": str(e)}), 500
-
-    
-# authenticate with token
-# ngrok.set_auth_token('2otdzQUTflD4b8Rr6rgKPkvSMUz_51jw94NLV3RPaw4Dhzh8W')
-
-# # Start ngrok and get the public URL
-# public_url = ngrok.connect(5000)  # Start ngrok tunnel on port 5000
-# print(f" * ngrok tunnel \"{public_url}\" -> \"http://127.0.0.1:5000\"")
