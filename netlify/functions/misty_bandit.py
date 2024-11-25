@@ -119,7 +119,8 @@ def play_audio_on_misty(file_path, volume=DEFAULT_VOLUME):
     try:
         # Construct the file URL served by the local server
         filename = os.path.basename(file_path)
-        file_url = f"http://{LOCAL_SERVER_IP}:{LOCAL_SERVER_PORT}/{AUDIO_FILES_DIR}/{filename}"
+        file_url = file_path
+        # f"http://{LOCAL_SERVER_IP}:{LOCAL_SERVER_PORT}/{AUDIO_FILES_DIR}/{filename}"
         
         # Send the request
         response = requests.post(
@@ -260,9 +261,10 @@ def log_drawing_data():
                 change_led_on_misty(led_data)
 
                 #play audio on misty
-                speech_data  = speech["char_s1"]
-                print(f"charactersitic audio path: {speech_data}")
-                play_audio_on_misty(speech_data)
+                # speech_data  = speech["char_s1"]
+                speech_url = f"https://raw.githubusercontent.com/aboadiag/Drawing-App/refs/heads/main/misty_audio_files/misty_char1.mp3"
+                print(f"charactersitic audio path: {speech_url}")
+                play_audio_on_misty(speech_url)
 
                 # speech_data = {"text": "Please continue drawing for a few more seconds."}
                 print("Switching to Charismatic personality. LED color: Blue, Speech: Direct")
@@ -273,11 +275,11 @@ def log_drawing_data():
                 change_led_on_misty(led_data)
 
                 #play audio on misty
-                speech_data  = speech["unchar_s1"]
-                print(f"uncharactersitic audio path: {speech_data}")
-                play_audio_on_misty(speech_data)
-                # speech_data = {"text": "Maybe you could continue drawing?"}
-
+                speech_url  = f"https://github.com/aboadiag/Drawing-App/blob/main/misty_audio_files/misty_unchar1.mp3"
+                # speech["unchar_s1"]
+                print(f"uncharactersitic audio path: {speech_url}")
+                play_audio_on_misty(speech_url)
+                
                 print("Switching to Uncharismatic personality. LED color: Green, Speech: Indirect")
 
             last_personality_change_time = timestamp_seconds  # Update the last personality change time
