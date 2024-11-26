@@ -10,26 +10,105 @@ import requests
 import json
 from collections import deque
 from datetime import datetime
-import csv
+import csv, random, string
 
 # Define constants
+# Base directory for user logs
+USER_LOG_BASE_PATH = "./user_logs"
+
+def generate_unique_id():
+    """Generate a random unique ID."""
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+
+global_unique_id = generate_unique_id()
+
+# MISTY URL AND ENDPOINTS
 MISTY_URL = "http://172.26.189.224"
 AUDIO_PLAY_ENDPOINT = "/api/audio/play"
 LED_ENDPOINT = "/api/led"
-AUDIO_FILES_DIR = "misty_audio_files"
-DEFAULT_VOLUME = 100
-LOCAL_SERVER_IP = "172.26.19.29"  # Replace with your local machine's IP address
-LOCAL_SERVER_PORT = 8000
+ARM_ENDPOINT = "/api/arms"
+FACE_IMAGE_ENDPOINT = "/api/images/display"
+HEAD_ENDPOINT = "/api/head"
 
-# Speech file names
-speech = {
-    "char_s1": f"{AUDIO_FILES_DIR}/misty_char1.mp3",
-    "unchar_s1": f"{AUDIO_FILES_DIR}/misty_unchar1.mp3",
+AUDIO_FILES_DIR = "misty_audio_files"
+DEFAULT_VOLUME = 50
+
+# Speech file names (stored in google drive misty_audio_files)
+speech_file = {
+    "char_s1": "https://drive.google.com/uc?id=1oJ6cL8X-b1PZAhO_7BIJwVa_cou9tyBa",
+    "unchar_s1": "https://drive.google.com/uc?id=1jDwAgw4YFZvfJXHogHvNqLim3vhD4xMp",
 }
+
 
 # Misty API endpoints
 led_url = f"{MISTY_URL}{LED_ENDPOINT}"
 audio_url = f"{MISTY_URL}{AUDIO_PLAY_ENDPOINT}"
+arms_url = f"{MISTY_URL}{ARM_ENDPOINT}"
+face_url = f"{MISTY_URL}{FACE_IMAGE_ENDPOINT}"
+head_url = f"{MISTY_URL}{HEAD_ENDPOINT}"
+
+# ----------------------------- MISTY EXPRESSIONS -----------------------#
+# DEFAULT
+default_led =  {"red": 255, "green": 255, "blue": 255} # white (default)
+default_arms = {
+  "LeftArmPosition": 85, # arm straight down [in deg]
+  "RightArmPosition": 85, # arm straight down
+  "LeftArmVelocity": 10, # between 0-100
+  "RightArmVelocity": 10
+}
+
+default_head = {
+  "Pitch": 0, # head not tilted up or down
+  "Roll": 0, # head not tilted side/side
+  "Yaw": 0, # head not turned left or right
+  "Velocity": 60 # move head (0-100)
+}
+default_face =  {
+    "FileName": "e_DefaultContent.jpg",
+    "Alpha": 1,
+}
+
+# CHARASMATIC
+#  VERBAL:
+char_speech  = speech_file["char_s1"]
+
+# NON-VERBAL:
+char_face = {
+    "FileName": "e_Joy.jpg",
+    "Alpha": 1,
+}
+char_arms_start = {
+    "LeftArmPosition": -28, #up
+    "RightArmPosition": -28,
+  "LeftArmVelocity": 50,
+  "RightArmVelocity": 50,
+}
+
+char_arms_end = {
+    "LeftArmPosition": 90, #down
+    "RightArmPosition": 90,
+  "LeftArmVelocity": 50,
+  "RightArmVelocity": 50,
+}
+
+char_head = {
+    "Pitch": 0, # head not tilted up or down
+  "Roll": 0, # head not tilted side/side
+  "Yaw": 75, # head turned left
+  "Velocity": 60
+}
+char_led = {"red": 0, "green": 0, "blue": 255}
+
+# UNCHARASMATIC
+#  VERBAL:
+unchar_speech  = speech_file["unchar_s1"]
+
+# NON-VERBAL
+unchar_arms = default_arms
+unchar_face = default_face
+unchar_head = default_head
+unchar_led =  default_led
+# ----------------------------- MISTY EXPRESSIONS -----------------------#
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -55,7 +134,7 @@ not_interactive = ["Stop Drawing", "Reset Canvas"]
 
 interaction_history = deque()  # Store timestamps and interactivity scores (1 or 0)
 INTERACTIVITY_TIME_WINDOW  = 10  # Time window for interactivity level classification (in seconds)
-PERSONALITY_CHANGE_TIME_WINDOW = 30  # Time window for changing the personality (in seconds)
+PERSONALITY_CHANGE_TIME_WINDOW = 15  # Time window for changing the personality (in seconds)
 
 
 # Track the last interaction time and last personality change time
@@ -76,9 +155,6 @@ arms = [
 # Initialize the Agent with ThompsonSampling policy
 agent = Agent(arms, ThompsonSampling(), random_seed=0)
 
-# # Set the time window in seconds (e.g., 60 seconds)
-# TIME_WINDOW = 60
-
 # Initialize interaction history as an empty deque
 # Each entry in the deque will be a tuple (timestamp_seconds, interaction_value)
 interaction_history = deque()
@@ -87,14 +163,28 @@ interaction_history = deque()
 ######################################## BAYESIAN BANDIT SET UP ######################################################
 
 ######################################## USER INTERACTION DATA LOGGING #####################################################
-# Path to the CSV file
-CSV_LOG_PATH = "user_interactions.csv"
-#  Function to write data to CSV
-def log_to_csv(data):
-    """Log user interaction data to a CSV file."""
+
+def log_to_csv(data, reward_assignment=None, context=None, arm_selection=None):
+    """
+    Log user interaction data to a CSV file and additional data to JSON in a unique user folder.
+
+    Parameters:
+        data (dict): Interaction data containing 'timestamp', 'action', and 'interaction_value'.
+        reward_assignment (int, optional): Reward assignments for each action.
+        context (str, optional): Contextual information (e.g., "low", "medium", "high").
+        arm_selection (int, optional): Selected arm (e.g., 0 for Charismatic, 1 for Uncharismatic).
+    """
     try:
-        file_exists = os.path.isfile(CSV_LOG_PATH)
-        with open(CSV_LOG_PATH, mode='a', newline='', encoding='utf-8') as file:
+
+        # Use the persistent unique ID
+        unique_id = global_unique_id
+        user_log_path = os.path.join(USER_LOG_BASE_PATH, unique_id)
+        os.makedirs(user_log_path, exist_ok=True)
+
+        # Log the interaction data to a CSV file
+        csv_file_path = os.path.join(user_log_path, "interaction_log.csv")
+        file_exists = os.path.isfile(csv_file_path)
+        with open(csv_file_path, mode='a', newline='', encoding='utf-8') as file:
             fieldnames = ['timestamp', 'action', 'interaction_value']
             writer = csv.DictWriter(file, fieldnames=fieldnames)
 
@@ -103,25 +193,35 @@ def log_to_csv(data):
                 writer.writeheader()
 
             writer.writerow(data)
-        print(f"Logged data: {data}")
-    except Exception as e:
-        print(f"Error logging to CSV: {e}")
+        print(f"Logged interaction data: {data}")
 
+        # Log additional data to a JSON file
+        metadata = {
+            "action_distribution": data.get("action"),  # Use action from data for action_distribution
+            "reward_assignment": reward_assignment,
+            "context": context,
+            "arm_selection": arm_selection,
+            "log_timestamp": datetime.now().isoformat()
+        }
+
+        # Write metadata to a JSON file
+        metadata_file_path = os.path.join(user_log_path, "metadata.json")
+        with open(metadata_file_path, mode='w', encoding='utf-8') as json_file:
+            json.dump(metadata, json_file, indent=4)
+        print(f"Logged metadata to {metadata_file_path}")
+
+    except Exception as e:
+        print(f"Error logging to user folder: {e}")
 ######################################## USER INTERACTION DATA LOGGING #####################################################
 
 # -------------------------------------------- HELPER FUNCTIONS -----------------------------------------------------
 
 ######################################## MISTY HELPER FUNCTIONS ######################################################
-#Playing new audio files:
-def play_audio_on_misty(file_path, volume=DEFAULT_VOLUME):
-    print("playing audio on misty...")
+# ------------------- CHANGING MISTY'S PERSONA ------------------------------------ #
+def play_audio_on_misty(file_url, volume=DEFAULT_VOLUME):
+    print("Playing audio on misty...")
     """Send a POST request to Misty to play audio."""
     try:
-        # Construct the file URL served by the local server
-        filename = os.path.basename(file_path)
-        file_url = file_path
-        # f"http://{LOCAL_SERVER_IP}:{LOCAL_SERVER_PORT}/{AUDIO_FILES_DIR}/{filename}"
-        
         # Send the request
         response = requests.post(
             audio_url,
@@ -149,9 +249,8 @@ def play_audio_on_misty(file_path, volume=DEFAULT_VOLUME):
     return jsonify({"status": "success", "message": "Audio file received and played sucessfully"}), 200
 
 def change_led_on_misty(led_data):
-    print("changing misty's led...")
+    print("Changing misty's led...")
     try:
-        # response = requests.post(MISTY_URL + 'led', json=led_data)
         response = requests.post(
             led_url,
             headers={"Content-Type": "application/json"},
@@ -176,7 +275,88 @@ def change_led_on_misty(led_data):
 
     return jsonify({"status": "success", "message": "Action processed and LED color updated"}), 200
 
+def change_misty_face(face_data):
+    print("Changing misty's face expression...")
+    try:
+        response = requests.post(
+            face_url,
+            headers={"Content-Type": "application/json"},
+            data=json.dumps(face_data))
+        
+        if response.status_code == 200:
+            print("Face expression changed successfully")
+            print(response.json())  # Print response from Misty (optional)
+        else:
+            print(f"Error: {response.status_code}")
+            return jsonify({"status": "error", "message": f"Face expression change failed with status code {response.status_code}"}), 500
 
+    #timeout exception        
+    except requests.exceptions.Timeout:
+        print("Timeout occurred while trying to connect to Misty")
+        return jsonify({"status": "error", "message": "Timeout error while connecting to Misty"}), 500
+
+    #failure to send request request
+    except requests.exceptions.RequestException as e:
+        print(f"Error making request: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+    return jsonify({"status": "success", "message": "Action processed and Face expression updated"}), 200
+
+def move_misty_head(head_data):
+    print("Moving misty's head...")
+    try:
+        response = requests.post(
+            head_url,
+            headers={"Content-Type": "application/json"},
+            data=json.dumps(head_data))
+        
+        if response.status_code == 200:
+            print("Face expression changed successfully")
+            print(response.json())  # Print response from Misty (optional)
+        else:
+            print(f"Error: {response.status_code}")
+            return jsonify({"status": "error", "message": f"Head position change failed with status code {response.status_code}"}), 500
+
+    #timeout exception        
+    except requests.exceptions.Timeout:
+        print("Timeout occurred while trying to connect to Misty")
+        return jsonify({"status": "error", "message": "Timeout error while connecting to Misty"}), 500
+
+    #failure to send request request
+    except requests.exceptions.RequestException as e:
+        print(f"Error making request: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+    return jsonify({"status": "success", "message": "Action processed and Head position updated"}), 200
+
+def move_arms_on_misty(arm_data):
+    print("Moving misty's arms...")
+    try:
+        response = requests.post(
+            arms_url,
+            headers={"Content-Type": "application/json"},
+            data=json.dumps(arm_data))
+        
+        if response.status_code == 200:
+            print("ARM moved successfully")
+            print(response.json())  # Print response from Misty (optional)
+        else:
+            print(f"Error: {response.status_code}")
+            return jsonify({"status": "error", "message": f"Arms move failed with status code {response.status_code}"}), 500
+
+    #timeout exception        
+    except requests.exceptions.Timeout:
+        print("Timeout occurred while trying to connect to Misty")
+        return jsonify({"status": "error", "message": "Timeout error while connecting to Misty"}), 500
+
+    #failure to send request request
+    except requests.exceptions.RequestException as e:
+        print(f"Error making request: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+    return jsonify({"status": "success", "message": "Action processed and Arms moved"}), 200
+
+# ------------------- CHANGING MISTY'S PERSONA ------------------------------------ #
 ######################################## MISTY HELPER FUNCTIONS ######################################################
 
 ######################################## BAYESIAN BANDIT HELPER FUNCTIONS ######################################################
@@ -211,7 +391,6 @@ def convert_timestamp_to_seconds(timestamp_str):
 @app.route('/logDrawingData', methods=['POST'])
 def log_drawing_data():
     global last_interactivity_update_time, last_personality_change_time  # Track time for both windows
-
     try:
         data = request.json
         action = data.get("action")
@@ -224,13 +403,12 @@ def log_drawing_data():
         # Assign rewards            
         interaction_value = 1 if action in interactive else 0
 
-        # Log the interaction data to CSV
+        # Prepare interaction data
         log_data = {
             'timestamp': timestamp_seconds,
             'action': action,
             'interaction_value': interaction_value
         }
-        log_to_csv(log_data)
         
         #save action and timestamp
         interaction_history.append((timestamp_seconds, action))
@@ -250,37 +428,37 @@ def log_drawing_data():
             print("Proceeding with personality change...") 
 
             # Select an action (personality) based on the current policy
-            chosen_action = agent.pull()[0]  # Pull the selected action (this selects an arm)
+            chosen_action,  = agent.pull()  # Pull the selected action (this selects an arm)
             print(f"Chosen Action: {chosen_action}")
+
+            # Log all relevant data
+            log_to_csv(
+                data=log_data,
+                reward_assignment= interaction_value,
+                context=context,
+                arm_selection=chosen_action
+            )
 
             # Change Misty's PERSONALITY/chosen action
             if chosen_action == 0:
 
-                # Charismatic Personality (LED color blue)
-                led_data = {"red": 0, "green": 0, "blue": 255}
-                change_led_on_misty(led_data)
-
-                #play audio on misty
-                # speech_data  = speech["char_s1"]
-                speech_url = f"https://raw.githubusercontent.com/aboadiag/Drawing-App/refs/heads/main/misty_audio_files/misty_char1.mp3"
-                print(f"charactersitic audio path: {speech_url}")
-                play_audio_on_misty(speech_url)
-
-                # speech_data = {"text": "Please continue drawing for a few more seconds."}
-                print("Switching to Charismatic personality. LED color: Blue, Speech: Direct")
+                # Charismatic Personality (Direct requests, eye contact and arm movement while speaking)
+                change_led_on_misty(char_led)
+                # play_audio_on_misty(char_speech)
+                change_misty_face(char_face)
+                move_arms_on_misty(char_arms_start)
+                #delay for 5 seconds:
+                time.sleep(5)
+                move_arms_on_misty(char_arms_end)
+                move_misty_head(char_head)
 
             else:
-                # Uncharismatic Personality (Indirect requests, No eye contact, No gestures)
-                led_data = {"red": 0, "green": 255, "blue": 0}
-                change_led_on_misty(led_data)
-
-                #play audio on misty
-                speech_url  = f"https://github.com/aboadiag/Drawing-App/blob/main/misty_audio_files/misty_unchar1.mp3"
-                # speech["unchar_s1"]
-                print(f"uncharactersitic audio path: {speech_url}")
-                play_audio_on_misty(speech_url)
-                
-                print("Switching to Uncharismatic personality. LED color: Green, Speech: Indirect")
+                # Uncharismatic Personality (Indirect requests, No eye contact and default gestures while speaking)
+                change_led_on_misty(unchar_led)
+                # play_audio_on_misty(unchar_speech)
+                change_misty_face(unchar_face)
+                move_arms_on_misty(unchar_arms)
+                move_misty_head(unchar_head)
 
             last_personality_change_time = timestamp_seconds  # Update the last personality change time
             print(f"last personality change at {last_personality_change_time}")
