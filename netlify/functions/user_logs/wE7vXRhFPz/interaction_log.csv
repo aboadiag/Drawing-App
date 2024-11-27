@@ -1,0 +1,25 @@
+timestamp,action,interaction_value
+1732648148.981,Reset Canvas,0
+1732648166.114,Start Drawing,1
+1732648166.573,Stop Drawing,0
+1732648182.044,Changed Color to #ff0000,0
+1732648197.174,Start Drawing,1
+1732648212.707,Start Drawing,1
+1732648228.769,Switched to Erase,1
+1732648229.273,Start Drawing,1
+1732648230.407,Stop Drawing,0
+1732648231.281,Start Drawing,1
+1732648231.833,Stop Drawing,0
+1732648250.694,Start Drawing,1
+1732648251.039,Stop Drawing,0
+1732648268.759,Start Drawing,1
+1732648269.351,Stop Drawing,0
+1732648284.367,Stop Drawing,0
+1732648284.952,Start Drawing,1
+1732648285.417,Stop Drawing,0
+1732648301.483,Changed Color to #808080,0
+1732648302.515,Start Drawing,1
+1732648303.177,Stop Drawing,0
+1732648304.909,Changed Color to #00ff00,0
+1732648305.284,Start Drawing,1
+1732648320.088,Changed Color to #000000,0

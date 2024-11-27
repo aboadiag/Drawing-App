@@ -1,0 +1,7 @@
+{
+    "action_distribution": "Start Drawing",
+    "reward_assignment": 1,
+    "context": "medium",
+    "arm_selection": 1,
+    "log_timestamp": "2024-11-26T14:00:26.315594"
+}

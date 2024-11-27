@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from pyngrok import ngrok
-from bayesianbandits import Arm, NormalInverseGammaRegressor, Agent, ThompsonSampling, UpperConfidenceBound
+from bayesianbandits import Arm, NormalInverseGammaRegressor, Agent, ThompsonSampling, ContextualAgent
 from gtts import gTTS
 import os
 import numpy as np
@@ -11,6 +11,7 @@ import json
 from collections import deque
 from datetime import datetime
 import csv, random, string
+from enum import Enum
 
 # Define constants
 # Base directory for user logs
@@ -26,7 +27,7 @@ global_unique_id = generate_unique_id()
 MISTY_URL = "http://172.26.189.224"
 AUDIO_PLAY_ENDPOINT = "/api/audio/play"
 LED_ENDPOINT = "/api/led"
-ARM_ENDPOINT = "/api/arms"
+ARM_ENDPOINT = "/api/arms/set"
 FACE_IMAGE_ENDPOINT = "/api/images/display"
 HEAD_ENDPOINT = "/api/head"
 
@@ -61,7 +62,7 @@ default_head = {
   "Pitch": 0, # head not tilted up or down
   "Roll": 0, # head not tilted side/side
   "Yaw": 0, # head not turned left or right
-  "Velocity": 60 # move head (0-100)
+  "Velocity": 85 # move head (0-100)
 }
 default_face =  {
     "FileName": "e_DefaultContent.jpg",
@@ -92,10 +93,10 @@ char_arms_end = {
 }
 
 char_head = {
-    "Pitch": 0, # head not tilted up or down
+"Pitch": 0, # head not tilted up or down
   "Roll": 0, # head not tilted side/side
-  "Yaw": 75, # head turned left
-  "Velocity": 60
+  "Yaw": 40, # head turned left
+  "Velocity": 85
 }
 char_led = {"red": 0, "green": 0, "blue": 255}
 
@@ -108,6 +109,9 @@ unchar_arms = default_arms
 unchar_face = default_face
 unchar_head = default_head
 unchar_led =  default_led
+
+# Flag to track if Misty has been initialized
+misty_initialized = False
 # ----------------------------- MISTY EXPRESSIONS -----------------------#
 
 # Initialize Flask app
@@ -131,10 +135,9 @@ interactive = ["Start Drawing", "Switched to Paint", "Changed Color",
                                     "Switched to Erase", "Canvas Saved", "Changed Line Width"]
 not_interactive = ["Stop Drawing", "Reset Canvas"]
 
-
-interaction_history = deque()  # Store timestamps and interactivity scores (1 or 0)
+interaction_history = deque()  # Each entry in the deque will be a tuple (timestamp_seconds, interaction_value): Store timestamps and interactivity scores (1 or 0)
 INTERACTIVITY_TIME_WINDOW  = 10  # Time window for interactivity level classification (in seconds)
-PERSONALITY_CHANGE_TIME_WINDOW = 15  # Time window for changing the personality (in seconds)
+PERSONALITY_CHANGE_TIME_WINDOW = 20  # Time window for changing the personality (in seconds)
 
 
 # Track the last interaction time and last personality change time
@@ -145,73 +148,77 @@ last_personality_change_time = 0  # Timestamp of the last personality change
 personalities = ["Charismatic", "Uncharismatic"]
 
 # Define Arms for Charismatic and Uncharismatic
-arms = [
+context_arms = [
     Arm(0, learner=NormalInverseGammaRegressor()),  # Arm for Charismatic (action 0)
     Arm(1, learner=NormalInverseGammaRegressor())   # Arm for Uncharismatic (action 1)
 ]
 
+# Initialize the Contextual Bandit Agent with ThompsonSampling policy
+context_agent = ContextualAgent(arms=context_arms, policy=ThompsonSampling())
 
+contexts = {
+    "low": np.array([[0.1]]),     # Low interactivity
+    "medium": np.array([[0.5]]),  # Medium interactivity
+    "high": np.array([[0.9]])# High interactivity
+}
 
-# Initialize the Agent with ThompsonSampling policy
-agent = Agent(arms, ThompsonSampling(), random_seed=0)
-
-# Initialize interaction history as an empty deque
-# Each entry in the deque will be a tuple (timestamp_seconds, interaction_value)
-interaction_history = deque()
-
-
+        
 ######################################## BAYESIAN BANDIT SET UP ######################################################
 
 ######################################## USER INTERACTION DATA LOGGING #####################################################
+# Use the persistent unique ID to create the file path
+def get_user_log_path():
+    """
+    Generates a user-specific path based on the unique ID.
+    """
+    unique_id = global_unique_id  # Using the global unique ID
+    start_interaction(unique_id) # intiialize the misty
+    time.sleep(5)
+    print(f"The unique ID is:{unique_id}")
+    user_log_path = os.path.join(USER_LOG_BASE_PATH, unique_id)
+    os.makedirs(user_log_path, exist_ok=True)  # Ensure the directory exists
+    return os.path.join(user_log_path, "interaction_log.csv")  # Return full file path
 
+# Initialize the log file (only creates the file if it doesn't exist)
+def initialize_log_file():
+    log_file_path = get_user_log_path()
+    if not os.path.exists(log_file_path):
+        with open(log_file_path, mode='w', newline='') as file:
+            writer = csv.DictWriter(file, fieldnames=[
+                'timestamp', 'action', 'interaction_value', 'reward_assignment', 'context', 'arm_selection', 'log_timestamp'
+            ])
+            writer.writeheader()
+
+# Log data into the user-specific CSV file
 def log_to_csv(data, reward_assignment=None, context=None, arm_selection=None):
     """
-    Log user interaction data to a CSV file and additional data to JSON in a unique user folder.
-
-    Parameters:
-        data (dict): Interaction data containing 'timestamp', 'action', and 'interaction_value'.
-        reward_assignment (int, optional): Reward assignments for each action.
-        context (str, optional): Contextual information (e.g., "low", "medium", "high").
-        arm_selection (int, optional): Selected arm (e.g., 0 for Charismatic, 1 for Uncharismatic).
+    Log the action interaction to a CSV file with additional metadata.
     """
-    try:
+    log_file_path = get_user_log_path()
+    log_timestamp = timestamp_to_iso(data['timestamp'])  # Convert timestamp to ISO format
 
-        # Use the persistent unique ID
-        unique_id = global_unique_id
-        user_log_path = os.path.join(USER_LOG_BASE_PATH, unique_id)
-        os.makedirs(user_log_path, exist_ok=True)
+    # Log data including all the necessary fields
+    with open(log_file_path, mode='a', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=[
+            'timestamp', 'action', 'interaction_value', 'reward_assignment', 'context', 'arm_selection', 'log_timestamp'
+        ])
+        writer.writerow({
+            'timestamp': data['timestamp'],
+            'action': data['action'],
+            'interaction_value': data['interaction_value'],
+            'reward_assignment': reward_assignment,
+            'context': context,
+            'arm_selection': arm_selection,
+            'log_timestamp': log_timestamp
+        })
+    print("Logged interaction data to CSV.")
 
-        # Log the interaction data to a CSV file
-        csv_file_path = os.path.join(user_log_path, "interaction_log.csv")
-        file_exists = os.path.isfile(csv_file_path)
-        with open(csv_file_path, mode='a', newline='', encoding='utf-8') as file:
-            fieldnames = ['timestamp', 'action', 'interaction_value']
-            writer = csv.DictWriter(file, fieldnames=fieldnames)
-
-            # Write header if the file doesn't exist
-            if not file_exists:
-                writer.writeheader()
-
-            writer.writerow(data)
-        print(f"Logged interaction data: {data}")
-
-        # Log additional data to a JSON file
-        metadata = {
-            "action_distribution": data.get("action"),  # Use action from data for action_distribution
-            "reward_assignment": reward_assignment,
-            "context": context,
-            "arm_selection": arm_selection,
-            "log_timestamp": datetime.now().isoformat()
-        }
-
-        # Write metadata to a JSON file
-        metadata_file_path = os.path.join(user_log_path, "metadata.json")
-        with open(metadata_file_path, mode='w', encoding='utf-8') as json_file:
-            json.dump(metadata, json_file, indent=4)
-        print(f"Logged metadata to {metadata_file_path}")
-
-    except Exception as e:
-        print(f"Error logging to user folder: {e}")
+# Convert timestamp to ISO format
+def timestamp_to_iso(timestamp):
+    """
+    Convert a timestamp (in seconds) to an ISO 8601 format string.
+    """
+    return datetime.utcfromtimestamp(timestamp).isoformat()
 ######################################## USER INTERACTION DATA LOGGING #####################################################
 
 # -------------------------------------------- HELPER FUNCTIONS -----------------------------------------------------
@@ -356,6 +363,21 @@ def move_arms_on_misty(arm_data):
 
     return jsonify({"status": "success", "message": "Action processed and Arms moved"}), 200
 
+def initialize_misty():
+#  play_audio_on_misty()
+ change_led_on_misty(default_led) 
+ change_misty_face(default_face)
+ move_misty_head(default_head)
+ move_arms_on_misty(default_arms)
+
+
+def start_interaction(unique_id):
+    global misty_initialized
+    
+    if not misty_initialized:
+        print("Initializing Misty...")
+        initialize_misty()  # Initialize Misty if it's the first interaction
+        misty_initialized = True  # Mark that Misty has been initialized
 # ------------------- CHANGING MISTY'S PERSONA ------------------------------------ #
 ######################################## MISTY HELPER FUNCTIONS ######################################################
 
@@ -386,12 +408,13 @@ def convert_timestamp_to_seconds(timestamp_str):
 ######################################## BAYESIAN BANDIT HELPER FUNCTIONS ######################################################
 
 # -------------------------------------------- HELPER FUNCTIONS -----------------------------------------------------
-
 # Define the route for logging user data
 @app.route('/logDrawingData', methods=['POST'])
 def log_drawing_data():
     global last_interactivity_update_time, last_personality_change_time  # Track time for both windows
+    global context
     try:
+        # collect data from client (with user interactions)
         data = request.json
         action = data.get("action")
         timestamp_str = data.get("timestamp")
@@ -400,68 +423,53 @@ def log_drawing_data():
         # Convert the timestamp to seconds since the epoch
         timestamp_seconds = convert_timestamp_to_seconds(timestamp_str)
    
-        # Assign rewards            
-        interaction_value = 1 if action in interactive else 0
-
-        # Prepare interaction data
-        log_data = {
-            'timestamp': timestamp_seconds,
-            'action': action,
-            'interaction_value': interaction_value
-        }
-        
-        #save action and timestamp
+        #save user interactions (i.e. "actions") and timestamp
         interaction_history.append((timestamp_seconds, action))
 
-        # --- Interactivity Classification ---  
-        if timestamp_seconds - last_interactivity_update_time >= INTERACTIVITY_TIME_WINDOW:
+        # Classify the interactivity level based on recent actions
+        context_label = classify_interactivity_level(timestamp_seconds)
+        context = contexts[context_label]  # Set the current context (low, medium, high)
+        print(f"Context is: {context_label}")
 
-            # Classify interactivity level
-            context = classify_interactivity_level(timestamp_seconds)
-            print(f"Interactivity Level: {context}")
-            last_interactivity_update_time = timestamp_seconds  # Update the time after classifying
+        # Assign rewards: interaction_value          
+        reward = 1 if action in interactive else 0
+
+        # Log all relevant data
+        log_to_csv(data, reward_assignment=reward, context=context_label,arm_selection=None)
+
+        # Select an arm based on the context and estimated reward probability with said arm
+        predicted_arm = context_agent.pull(context)  
+        print(f"Chosen Arm Token: {predicted_arm}")
+
+        print("Proceeding with personality change...") 
+
+        # Change Misty's PERSONALITY/chosen action
+        if predicted_arm == 0: # Charismatic Personality (Direct requests, eye contact and arm movement while speaking)
+            change_led_on_misty(char_led)
+            # play_audio_on_misty(char_speech)
+            change_misty_face(char_face)
+            move_misty_head(char_head)
+            move_arms_on_misty(char_arms_start)
+            time.sleep(5)
+            move_arms_on_misty(char_arms_end)
 
 
-        # --- Personality Change ---
-        # Only change personality if more than PERSONALITY_CHANGE_TIME_WINDOW seconds have passed
-        if timestamp_seconds - last_personality_change_time >= PERSONALITY_CHANGE_TIME_WINDOW:
-            print("Proceeding with personality change...") 
+        elif predicted_arm == 1:  # Uncharismatic Personality (Indirect requests, No eye contact and default gestures while speaking)
+            change_led_on_misty(unchar_led)
+            # play_audio_on_misty(unchar_speech)
+            change_misty_face(unchar_face)
+            move_arms_on_misty(unchar_arms)
+            move_misty_head(unchar_head)
 
-            # Select an action (personality) based on the current policy
-            chosen_action,  = agent.pull()  # Pull the selected action (this selects an arm)
-            print(f"Chosen Action: {chosen_action}")
 
-            # Log all relevant data
-            log_to_csv(
-                data=log_data,
-                reward_assignment= interaction_value,
-                context=context,
-                arm_selection=chosen_action
-            )
+        # Update the bandit with the observed reward
+        context_agent.update(predicted_arm, reward)  
 
-            # Change Misty's PERSONALITY/chosen action
-            if chosen_action == 0:
+        # Log the arm selection after the agent's decision
+        log_to_csv(data, reward_assignment=reward, context=context_label, arm_selection=predicted_arm)
 
-                # Charismatic Personality (Direct requests, eye contact and arm movement while speaking)
-                change_led_on_misty(char_led)
-                # play_audio_on_misty(char_speech)
-                change_misty_face(char_face)
-                move_arms_on_misty(char_arms_start)
-                #delay for 5 seconds:
-                time.sleep(5)
-                move_arms_on_misty(char_arms_end)
-                move_misty_head(char_head)
-
-            else:
-                # Uncharismatic Personality (Indirect requests, No eye contact and default gestures while speaking)
-                change_led_on_misty(unchar_led)
-                # play_audio_on_misty(unchar_speech)
-                change_misty_face(unchar_face)
-                move_arms_on_misty(unchar_arms)
-                move_misty_head(unchar_head)
-
-            last_personality_change_time = timestamp_seconds  # Update the last personality change time
-            print(f"last personality change at {last_personality_change_time}")
+            # last_personality_change_time = timestamp_seconds  # Update the last personality change time
+            # print(f"last personality change at {last_personality_change_time}")
         
     except Exception as e:
         print(f"Error processing data: {e}")
@@ -473,3 +481,48 @@ def log_drawing_data():
 # Run the Flask app
 if __name__ == "__main__":
     app.run(debug=True, port=80) #flask should listen here
+
+
+
+    
+     # if timestamp_seconds - last_interactivity_update_time >= INTERACTIVITY_TIME_WINDOW:
+
+        #     # Classify interactivity level
+        #     context = classify_interactivity_level(timestamp_seconds)[0]
+        #     print(f"Interactivity Level: {context[1]}")
+        #     last_interactivity_update_time = timestamp_seconds  # Update the time after classifying
+
+        #log:
+        # log_to_csv(
+        #         data=log_data,
+        #         reward_assignment= context[0],
+        #         context=context[1],
+        # )
+        # --- Personality Change ---
+        # Only change personality if more than PERSONALITY_CHANGE_TIME_WINDOW seconds have passed
+        # if timestamp_seconds - last_personality_change_time >= PERSONALITY_CHANGE_TIME_WINDOW:
+
+        # Use the Contextual Agent to select an arm (personality)
+        # Select an action (personality) based the context
+        # context_key = classify_interactivity_level(timestamp_seconds)[1]  # Timestamp can be the current time or relevant time for your logic
+        # context = contexts[context_key]
+
+
+        # chosen_arm_token, = context_agent.pull(context)
+        # print(f"Chosen Arm Token: {chosen_arm_token}")
+
+
+#         class InteractivityLevel(Enum):
+# #     LOW = 0
+#     MEDIUM = 1
+#     HIGH = 2
+
+#     def get_value(self):
+#         """Return the corresponding np.array for each level of interactivity."""
+#         if self == InteractivityLevel.LOW:
+#             return np.array([[0.1]])  # Low interactivity
+#         elif self == InteractivityLevel.MEDIUM:
+#             return np.array([[0.5]])  # Medium interactivity
+#         elif self == InteractivityLevel.HIGH:
+#             return np.array([[0.9]])  # High interactivity
+

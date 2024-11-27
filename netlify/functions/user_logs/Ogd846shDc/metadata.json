@@ -1,0 +1,7 @@
+{
+    "action_distribution": "Stop Drawing",
+    "reward_assignment": 0,
+    "context": "high",
+    "arm_selection": null,
+    "log_timestamp": "2024-11-26T14:17:21.499209"
+}
