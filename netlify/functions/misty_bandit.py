@@ -132,7 +132,7 @@ user_actions = [
     "Changed Color", "Changed Line Width"
 ]
 interactive = ["Start Drawing", "Switched to Paint", "Changed Color",
-                                    "Switched to Erase", "Canvas Saved", "Changed Line Width to"]
+                                    "Switched to Erase", "Canvas Saved", "Changed Line Width"]
 not_interactive = ["Stop Drawing", "Reset Canvas"]
 
 interaction_history = deque(maxlen=10)  # Each entry in the deque will be a tuple (timestamp_seconds, interaction_value): Store timestamps and interactivity scores (1 or 0)
@@ -435,6 +435,9 @@ def log_drawing_data():
     try:
         # collect data from client (with user interactions)
         data = request.json
+        print(f"Raw payload: {request.data}")  # See the raw request body
+        print(f"Parsed JSON: {data}") 
+        
         action = data.get("action")
         timestamp_str = data.get("timestamp")
         print(f"Received Action: {action} at {timestamp_str}")

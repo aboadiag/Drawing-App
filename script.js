@@ -124,13 +124,13 @@ $(function(){
      $("#erase").click(function(){
          if(paint_erase=="paint"){
              paint_erase="erase";
-             //log user action:
-             logUserAction(paint_erase == "erase" ? "Switched to Erase" : "Switched to Paint");
-            
+             logUserAction("Switched to Erase");
+            //  logUserAction(paint_erase == "erase" ? "Switched to Erase" : "Switched to Paint");
          }
          else{
              paint_erase="paint";
-            
+             logUserAction("Switched to Paint");
+
          }
          $(this).toggleClass("eraseMode");
          
@@ -138,9 +138,10 @@ $(function(){
 
      //Change color input
      $("#paintColor").change(function(){
-         $("#circle").css("background-color",$(this).val());
+        var color = $(this).val();
+         $("#circle").css("background-color", color);
          //log user action:
-         logUserAction(`Changed Color to ${$(this).val()}`);
+         logUserAction(`Changed Color`, { color: color});
      });
 
      //change linewidth using slider
@@ -151,7 +152,7 @@ $(function(){
             $("#circle").height(ui.value);
             $("#circle").width(ui.value);
             ctx.lineWidth=ui.value;
-            logUserAction(`Changed Line Width`, { lineWidth: ui.value });
+            logUserAction(`Changed Line Width`, {lineWidth : ui.value});
             
         }
     });
