@@ -132,7 +132,7 @@ user_actions = [
     "Changed Color", "Changed Line Width"
 ]
 interactive = ["Start Drawing", "Switched to Paint", "Changed Color",
-                                    "Switched to Erase", "Canvas Saved", "Changed Line Width"]
+                                    "Switched to Erase", "Canvas Saved", "Changed Line Width to"]
 not_interactive = ["Stop Drawing", "Reset Canvas"]
 
 interaction_history = deque(maxlen=10)  # Each entry in the deque will be a tuple (timestamp_seconds, interaction_value): Store timestamps and interactivity scores (1 or 0)

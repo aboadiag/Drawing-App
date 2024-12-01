@@ -88,12 +88,6 @@ $(function(){
     }
     });
     
-    //store mouse movements:
-    // // store mouse movements:
-    // document.onmousemove(function(e){
-    //     var pageCoords = "( " + e.pageX + ", " + e.pageY + " )";
-    //     console.log(pageCoords);
-    // });
     container.mouseup(function(){
        paint=false
        //log user action
@@ -157,7 +151,7 @@ $(function(){
             $("#circle").height(ui.value);
             $("#circle").width(ui.value);
             ctx.lineWidth=ui.value;
-            logUserAction(`Changed Line Width to ${ui.value}`);
+            logUserAction(`Changed Line Width`, { lineWidth: ui.value });
             
         }
     });
