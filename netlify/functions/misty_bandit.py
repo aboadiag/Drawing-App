@@ -135,7 +135,7 @@ interactive = ["Start Drawing", "Switched to Paint", "Changed Color",
                                     "Switched to Erase", "Canvas Saved", "Changed Line Width"]
 not_interactive = ["Stop Drawing", "Reset Canvas"]
 
-interaction_history = deque()  # Each entry in the deque will be a tuple (timestamp_seconds, interaction_value): Store timestamps and interactivity scores (1 or 0)
+interaction_history = deque(maxlen=10)  # Each entry in the deque will be a tuple (timestamp_seconds, interaction_value): Store timestamps and interactivity scores (1 or 0)
 INTERACTIVITY_TIME_WINDOW  = 10  # Time window for interactivity level classification (in seconds)
 PERSONALITY_CHANGE_TIME_WINDOW = 20  # Time window for changing the personality (in seconds)
 
@@ -148,18 +148,18 @@ last_personality_change_time = 0  # Timestamp of the last personality change
 personalities = ["Charismatic", "Uncharismatic"]
 
 # Define Arms for Charismatic and Uncharismatic
-context_arms = [
+arms = [
     Arm(0, learner=NormalInverseGammaRegressor()),  # Arm for Charismatic (action 0)
     Arm(1, learner=NormalInverseGammaRegressor())   # Arm for Uncharismatic (action 1)
 ]
 
 # Initialize the Contextual Bandit Agent with ThompsonSampling policy
-context_agent = ContextualAgent(arms=context_arms, policy=ThompsonSampling())
+context_agent = ContextualAgent(arms, ThompsonSampling())
 
 contexts = {
-    "low": np.array([[0.1]]),     # Low interactivity
-    "medium": np.array([[0.5]]),  # Medium interactivity
-    "high": np.array([[0.9]])# High interactivity
+    "low": np.array([0.1]),     # Low interactivity
+    "medium": np.array([0.5]),  # Medium interactivity
+    "high": np.array([0.9])# High interactivity
 }
 
         
@@ -172,7 +172,7 @@ def get_user_log_path():
     Generates a user-specific path based on the unique ID.
     """
     unique_id = global_unique_id  # Using the global unique ID
-    start_interaction(unique_id) # intiialize the misty
+    # start_interaction(unique_id) # intiialize the misty
     time.sleep(5)
     print(f"The unique ID is:{unique_id}")
     user_log_path = os.path.join(USER_LOG_BASE_PATH, unique_id)
@@ -185,7 +185,7 @@ def initialize_log_file():
     if not os.path.exists(log_file_path):
         with open(log_file_path, mode='w', newline='') as file:
             writer = csv.DictWriter(file, fieldnames=[
-                'timestamp', 'action', 'interaction_value', 'reward_assignment', 'context', 'arm_selection', 'log_timestamp'
+                'timestamp', 'action', 'reward_assignment', 'context', 'arm_selection', 'log_timestamp'
             ])
             writer.writeheader()
 
@@ -200,12 +200,12 @@ def log_to_csv(data, reward_assignment=None, context=None, arm_selection=None):
     # Log data including all the necessary fields
     with open(log_file_path, mode='a', newline='') as file:
         writer = csv.DictWriter(file, fieldnames=[
-            'timestamp', 'action', 'interaction_value', 'reward_assignment', 'context', 'arm_selection', 'log_timestamp'
+            'timestamp', 'action', 'reward_assignment', 'context', 'arm_selection', 'log_timestamp'
         ])
         writer.writerow({
             'timestamp': data['timestamp'],
             'action': data['action'],
-            'interaction_value': data['interaction_value'],
+            # 'interaction_value': data['interaction_value'],
             'reward_assignment': reward_assignment,
             'context': context,
             'arm_selection': arm_selection,
@@ -371,7 +371,7 @@ def initialize_misty():
  move_arms_on_misty(default_arms)
 
 
-def start_interaction(unique_id):
+def start_interaction():
     global misty_initialized
     
     if not misty_initialized:
@@ -384,19 +384,32 @@ def start_interaction(unique_id):
 ######################################## BAYESIAN BANDIT HELPER FUNCTIONS ######################################################
 
 # Function to classify the interaction context
+
 def classify_interactivity_level(timestamp_seconds):
-    recent_actions = [action for _, action in interaction_history]
-
-    # Count the number of "interactive" and "not interactive" actions
-    high_interactivity_count = sum([1 for action in recent_actions if action in interactive])
-    low_interactivity_count = sum([1 for action in recent_actions if action in not_interactive])
-
-    if high_interactivity_count >= 4:
-        return "high"  # High interactivity if 4 or more interactive actions
-    elif low_interactivity_count >= 4:
-        return "low"  # Low interactivity if 4 or more not interactive actions
+    # Consider the last 10 actions for recent context
+    recent_actions = list(interaction_history)[-10:] #make a list and get
+    
+    # Define action rewards: assign weights to interactive and non-interactive actions
+    action_rewards = {
+        action: 1 for action in interactive
+    }
+    action_rewards.update({
+        action: 0 for action in not_interactive
+    })
+    
+    # Calculate context value: average of rewards for recent actions
+    if recent_actions:
+        context_value = sum(action_rewards[action] for _, action in recent_actions) / len(recent_actions)
     else:
-        return "medium"  # Medium interactivity if it's a mix of both
+        context_value = 0  # Default to 0 if there are no recent actions
+    
+    # Classify interactivity level based on context value thresholds
+    if context_value >= 0.8:  # High interactivity threshold
+        return "high"
+    elif context_value <= 0.2:  # Low interactivity threshold
+        return "low"
+    else:
+        return "medium"
 
 
 # Helper function to convert timestamp to seconds since the epoch
@@ -413,6 +426,12 @@ def convert_timestamp_to_seconds(timestamp_str):
 def log_drawing_data():
     global last_interactivity_update_time, last_personality_change_time  # Track time for both windows
     global context
+    global predicted_arm
+    # global last_chosen_arm
+
+
+    start_interaction() # intiialize the misty
+
     try:
         # collect data from client (with user interactions)
         data = request.json
@@ -429,47 +448,84 @@ def log_drawing_data():
         # Classify the interactivity level based on recent actions
         context_label = classify_interactivity_level(timestamp_seconds)
         context = contexts[context_label]  # Set the current context (low, medium, high)
-        print(f"Context is: {context_label}")
+        # print(f"Context is: {context_label}")
+        print(f"what is the context: {context}")
 
         # Assign rewards: interaction_value          
         reward = 1 if action in interactive else 0
 
+        print(f"reward value is {reward}")
+
+        # # Initialize last_chosen_arm to None
+        # predicted_arm = None
+        # last_chosen_arm = None
+
         # Log all relevant data
-        log_to_csv(data, reward_assignment=reward, context=context_label,arm_selection=None)
+        # log_to_csv(data, reward_assignment=reward, context=context_label,arm_selection=None)
 
-        # Select an arm based on the context and estimated reward probability with said arm
-        predicted_arm = context_agent.pull(context)  
-        print(f"Chosen Arm Token: {predicted_arm}")
+        # --------------- Classify interactivity level AND pull arm -------------------------
+            # Select an arm based on the context and estimated reward probability with said arm
 
-        print("Proceeding with personality change...") 
-
-        # Change Misty's PERSONALITY/chosen action
-        if predicted_arm == 0: # Charismatic Personality (Direct requests, eye contact and arm movement while speaking)
-            change_led_on_misty(char_led)
-            # play_audio_on_misty(char_speech)
-            change_misty_face(char_face)
-            move_misty_head(char_head)
-            move_arms_on_misty(char_arms_start)
-            time.sleep(5)
-            move_arms_on_misty(char_arms_end)
+        # --------------- Personality Change -------------------------
+        # Only change personality if more than PERSONALITY_CHANGE_TIME_WINDOW seconds have passed
+        if timestamp_seconds - last_personality_change_time >= PERSONALITY_CHANGE_TIME_WINDOW or timestamp_seconds - last_interactivity_update_time >= INTERACTIVITY_TIME_WINDOW:
+            print("Proceeding with personality change...") 
+            # print(f"char arms {arms[0]}")  # Should print the two arms with action 0 and 1
+            # print(f"unchar arms {arms[1]}")  # Should print the two arms with action 0 and 1
 
 
-        elif predicted_arm == 1:  # Uncharismatic Personality (Indirect requests, No eye contact and default gestures while speaking)
-            change_led_on_misty(unchar_led)
-            # play_audio_on_misty(unchar_speech)
-            change_misty_face(unchar_face)
-            move_arms_on_misty(unchar_arms)
-            move_misty_head(unchar_head)
+            predicted_arm, = context_agent.pull(context)
+            print(f"Chosen Arm: {predicted_arm}")
+
+            # if predicted_arm in arms:
+            #     # Continue with the action
+            #     print("Arm found")
+            # else:
+            #     print("Arm not found:", predicted_arm)
+
+            # Update the time after classifying
+            last_interactivity_update_time = timestamp_seconds 
+            print(f"last context classification occured at change at {last_interactivity_update_time}")
+
+            # Only trigger Misty actions if the selected personality has changed:
+            # if last_chosen_arm is None or predicted_arm != last_chosen_arm:
+                
+            # Change Misty's PERSONALITY/chosen action
+            if predicted_arm == 0: # Charismatic Personality (Direct requests, eye contact and arm movement while speaking)
+                print("Charasmatic Misty")
+                change_led_on_misty(char_led)
+                play_audio_on_misty(char_speech)
+                change_misty_face(char_face)
+                move_misty_head(char_head)
+                move_arms_on_misty(char_arms_start)
+                time.sleep(5)
+                move_arms_on_misty(char_arms_end)
 
 
-        # Update the bandit with the observed reward
-        context_agent.update(predicted_arm, reward)  
+            elif predicted_arm == 1:  # Uncharismatic Personality (Indirect requests, No eye contact and default gestures while speaking)
+                print("Charasmatic Misty")
+                change_led_on_misty(unchar_led)
+                play_audio_on_misty(unchar_speech)
+                change_misty_face(unchar_face)
+                move_arms_on_misty(unchar_arms)
+                move_misty_head(unchar_head)
+
+
+            # #update last chosen arm
+            # last_chosen_arm = predicted_arm
+
+            # Update the last personality change time
+            last_personality_change_time = timestamp_seconds  
+            print(f"last personality change at {last_personality_change_time}")
+
+
+            # Update the bandit with the predicted arm to update with context and the observed reward
+            context_agent.select_for_update(predicted_arm).update(context, reward)
 
         # Log the arm selection after the agent's decision
-        log_to_csv(data, reward_assignment=reward, context=context_label, arm_selection=predicted_arm)
+        # log_to_csv(data, reward_assignment=reward, context=context_label, arm_selection=predicted_arm)
 
-            # last_personality_change_time = timestamp_seconds  # Update the last personality change time
-            # print(f"last personality change at {last_personality_change_time}")
+
         
     except Exception as e:
         print(f"Error processing data: {e}")
@@ -480,7 +536,9 @@ def log_drawing_data():
 
 # Run the Flask app
 if __name__ == "__main__":
+    # start_interaction() # intiialize the misty
     app.run(debug=True, port=80) #flask should listen here
+
 
 
 
@@ -498,9 +556,7 @@ if __name__ == "__main__":
         #         reward_assignment= context[0],
         #         context=context[1],
         # )
-        # --- Personality Change ---
-        # Only change personality if more than PERSONALITY_CHANGE_TIME_WINDOW seconds have passed
-        # if timestamp_seconds - last_personality_change_time >= PERSONALITY_CHANGE_TIME_WINDOW:
+ 
 
         # Use the Contextual Agent to select an arm (personality)
         # Select an action (personality) based the context
@@ -525,4 +581,21 @@ if __name__ == "__main__":
 #             return np.array([[0.5]])  # Medium interactivity
 #         elif self == InteractivityLevel.HIGH:
 #             return np.array([[0.9]])  # High interactivity
+
+
+
+# def classify_interactivity_level(timestamp_seconds):
+#     recent_actions = [action for _, action in interaction_history]
+
+#     # Count the number of "interactive" and "not interactive" actions
+#     high_interactivity_count = sum([1 for action in recent_actions if action in interactive])
+#     low_interactivity_count = sum([1 for action in recent_actions if action in not_interactive])
+
+#     if high_interactivity_count >= 4:
+#         return "high"  # High interactivity if 4 or more interactive actions
+#     elif low_interactivity_count >= 4:
+#         return "low"  # Low interactivity if 4 or more not interactive actions
+#     else:
+#         return "medium"  # Medium interactivity if it's a mix of both
+    
 

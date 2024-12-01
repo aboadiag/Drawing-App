@@ -37,7 +37,9 @@ $(function(){
             console.error("Error sending data:", error);
         });
     }
-    
+
+    // Clear stored canvas data and reset the canvas when the page loads
+    localStorage.removeItem("imgCanvas");  // Remove saved canvas data
    // Reset the canvas when the page loads
    ctx.clearRect(0, 0, canvas.width, canvas.height);  // Clear canvas on load
    logUserAction("Reset Canvas");
