@@ -42,7 +42,8 @@ $(function(){
     localStorage.removeItem("imgCanvas");  // Remove saved canvas data
    // Reset the canvas when the page loads
    ctx.clearRect(0, 0, canvas.width, canvas.height);  // Clear canvas on load
-   logUserAction("Reset Canvas");
+   logUserAction("Reset Initialized");
+
 
     //onload load saved work from localStorage
     if(localStorage.getItem("imgCanvas")!=null){
@@ -155,6 +156,14 @@ $(function(){
             logUserAction(`Changed Line Width`, {lineWidth : ui.value});
             
         }
+    });
+
+    // Reset button logic
+    $("#reset").click(function () {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);  // Clear the canvas
+        paint_erase = "paint";  // Reset to paint mode
+        $("#erase").removeClass("eraseMode");
+        logUserAction("Reset Canvas");  // Log action for user-initiated reset
     });
     
 });
