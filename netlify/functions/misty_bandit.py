@@ -496,6 +496,44 @@ def convert_timestamp_to_seconds(timestamp_str):
 ######################################## BAYESIAN BANDIT HELPER FUNCTIONS ######################################################
 
 # -------------------------------------------- HELPER FUNCTIONS -----------------------------------------------------
+# Global flag to track Misty's execution state
+misty_action_in_progress = False
+
+def execute_misty_action(personality_queue):
+    global misty_action_in_progress
+    
+    if misty_action_in_progress:
+        # Skip if Misty is already performing an action
+        print("Misty is still executing an action. Waiting...")
+        return
+    
+    if personality_queue.is_empty():
+        #Choose the new personality based on the predicted arm (for demonstration)
+        new_personality = PERSONALITY_CHARISMATIC if predicted_arm == 1 else PERSONALITY_UNCHARISMATIC
+        maybe_queue_personality_change(new_personality, personality_queue, timestamp_seconds, last_personality_change_time)
+
+
+    # If no action is in progress, proceed to dequeue and execute
+    if not personality_queue.is_empty():
+        current_personality = personality_queue.dequeue()
+        print(f"Dequeued personality: {current_personality}")
+        misty_action_in_progress = True  # Set the flag
+        
+        # Call Misty actions
+        try:
+            print("Proceed with Misty personality change...")
+            update_misty_personality(current_personality)
+        except Exception as e:
+            print(f"Error executing Misty action: {e}")
+            misty_action_in_progress = False  # Reset flag on failure
+            return
+
+        # Once actions complete, reset the flag
+        misty_action_in_progress = False
+        print("Misty action completed. Ready for the next action.")
+    else:
+        print("No actions in the queue.")
+
 first_interaction = True
 # Main loop that runs before handling the drawing data
 def main_loop():
@@ -509,6 +547,7 @@ def main_loop():
 # Define the route for logging user data
 @app.route('/logDrawingData', methods=['POST'])
 def log_drawing_data(): 
+    global first_interaction
     global last_interactivity_update_time, last_personality_change_time  # Track time for both windows
     global context, predicted_arm
     global timestamp_seconds
@@ -525,6 +564,7 @@ def log_drawing_data():
     
     try:
         # collect data from client (with user interactions)
+
         data = request.json
         print(f"Raw payload: {request.data}")  # See the raw request body
         print(f"Parsed JSON: {data}") 
@@ -558,19 +598,7 @@ def log_drawing_data():
         # print(f"Timestamps seconds that have passed {timestamp_seconds}")
 
         # check when its time to execute
-        if personality_queue.is_empty():
-            #Choose the new personality based on the predicted arm (for demonstration)
-            new_personality = PERSONALITY_CHARISMATIC if predicted_arm == 1 else PERSONALITY_UNCHARISMATIC
-            maybe_queue_personality_change(new_personality, personality_queue, timestamp_seconds, last_personality_change_time)
-
-        #if its full, execute
-        if not personality_queue.is_empty():
-            # Dequeue and apply the personality change
-            current_personality = personality_queue.dequeue()
-            print(f"current personality {current_personality}")
-
-            print("Proceeding with personality change...") 
-            update_misty_personality(current_personality)
+        execute_misty_action(personality_queue)
 
         # Update the last personality change time
         # last_personality_change_time = timestamp_seconds  

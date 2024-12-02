@@ -157,14 +157,6 @@ $(function(){
             
         }
     });
-
-    // Reset button logic
-    $("#reset").click(function () {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);  // Clear the canvas
-        paint_erase = "paint";  // Reset to paint mode
-        $("#erase").removeClass("eraseMode");
-        logUserAction("Reset Canvas");  // Log action for user-initiated reset
-    });
     
 });
 
