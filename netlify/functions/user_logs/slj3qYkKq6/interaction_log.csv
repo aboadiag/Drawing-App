@@ -1,0 +1,70 @@
+timestamp,action,additionalData,reward_assignment,context,arm_selection,log_timestamp
+1733252109.113,Stop Drawing,{'duration': 547},0,medium,1,1733252109.113
+1733252109.842,Start Drawing,{},0,medium,1,1733252109.842
+1733252111.083,Stop Drawing,{'duration': 1241},0,medium,1,1733252111.083
+1733252111.901,Start Drawing,{},0,medium,1,1733252111.901
+1733252112.989,Stop Drawing,{'duration': 1088},0,medium,1,1733252112.989
+1733252113.656,Start Drawing,{},0,medium,1,1733252113.656
+1733252114.497,Stop Drawing,{'duration': 841},0,medium,1,1733252114.497
+1733252114.497,Start Drawing,{},1,medium,1,1733252114.497
+1733252115.625,Changed Line Width,{'lineWidth': 19},1,medium,1,1733252115.625
+1733252117.62,Changed Color,{'color': '#ff0000'},1,medium,1,1733252117.62
+1733252118.191,Start Drawing,{},1,medium,1,1733252118.191
+1733252119.733,Start Drawing,{},1,medium,1,1733252119.733
+1733252119.733,Stop Drawing,{'duration': 958},0,medium,1,1733252119.733
+1733252121.479,Stop Drawing,{'duration': 1746},0,medium,1,1733252121.479
+1733252121.974,Start Drawing,{},0,medium,1,1733252121.974
+1733252123.177,Stop Drawing,{'duration': 1203},0,medium,1,1733252123.177
+1733252123.574,Start Drawing,{},0,medium,1,1733252123.574
+1733252124.491,Stop Drawing,{'duration': 917},0,medium,1,1733252124.491
+1733252126.375,Changed Color,{'color': '#9900ff'},0,medium,1,1733252126.375
+1733252126.909,Start Drawing,{},0,medium,1,1733252126.909
+1733252127.845,Stop Drawing,{'duration': 936},0,medium,1,1733252127.845
+1733252128.321,Start Drawing,{},0,medium,1,1733252128.321
+1733252129.367,Stop Drawing,{'duration': 1046},0,medium,0,1733252129.367
+1733252132.041,Changed Color,{'color': '#00ff00'},0,medium,0,1733252132.041
+1733252133.403,Start Drawing,{},0,medium,0,1733252133.403
+1733252134.143,Stop Drawing,{'duration': 740},0,medium,0,1733252134.143
+1733252135.54,Changed Line Width,{'lineWidth': 14},0,medium,0,1733252135.54
+1733252136.142,Changed Line Width,{'lineWidth': 12},0,medium,0,1733252136.142
+1733252137.378,Reset Canvas,{'resetCount': 1},0,medium,0,1733252137.378
+1733252138.345,Start Drawing,{},0,medium,0,1733252138.345
+1733252138.825,Stop Drawing,{'duration': 480},0,medium,0,1733252138.825
+1733252141.776,Changed Color,{'color': '#ff00ff'},1,medium,1,1733252141.776
+1733252142.214,Start Drawing,{},1,medium,1,1733252142.214
+1733252143.041,Stop Drawing,{'duration': 827},1,medium,1,1733252143.041
+1733252143.498,Start Drawing,{},1,medium,1,1733252143.498
+1733252144.771,Stop Drawing,{'duration': 1273},1,medium,1,1733252144.771
+1733252145.12,Start Drawing,{},1,medium,1,1733252145.12
+1733252145.829,Stop Drawing,{'duration': 709},1,medium,1,1733252145.829
+1733252145.829,Changed Line Width,{'lineWidth': 19},1,medium,1,1733252145.829
+1733252146.289,Start Drawing,{},1,medium,1,1733252146.289
+1733252146.793,Stop Drawing,{'duration': 504},1,medium,1,1733252146.793
+1733252147.448,Changed Line Width,{'lineWidth': 13},1,medium,1,1733252147.448
+1733252149.164,Changed Color,{'color': '#000000'},1,medium,1,1733252149.164
+1733252149.535,Start Drawing,{},1,medium,1,1733252149.535
+1733252150.712,Start Drawing,{},1,medium,1,1733252150.712
+1733252151.639,Stop Drawing,{'duration': 927},1,medium,1,1733252151.639
+1733252152.099,Start Drawing,{},1,medium,1,1733252152.099
+1733252154.007,Stop Drawing,{'duration': 1908},1,medium,1,1733252154.007
+1733252154.281,Start Drawing,{},1,medium,1,1733252154.281
+1733252155.745,Stop Drawing,{'duration': 1464},1,medium,1,1733252155.745
+1733252156.04,Start Drawing,{},1,medium,1,1733252156.04
+1733252156.04,Stop Drawing,{'duration': 655},0,medium,1,1733252156.04
+1733252156.703,Stop Drawing,{'duration': 663},0,medium,1,1733252156.703
+1733252157.113,Start Drawing,{},0,medium,1,1733252157.113
+1733252157.937,Stop Drawing,{'duration': 824},0,medium,1,1733252157.937
+1733252158.309,Start Drawing,{},0,medium,1,1733252158.309
+1733252158.737,Stop Drawing,{'duration': 428},0,medium,1,1733252158.737
+1733252159.499,Changed Line Width,{'lineWidth': 17},0,medium,1,1733252159.499
+1733252161.725,Start Drawing,{},1,medium,1,1733252161.725
+1733252162.388,Stop Drawing,{'duration': 663},1,medium,1,1733252162.388
+1733252162.908,Start Drawing,{},1,medium,1,1733252162.908
+1733252163.755,Stop Drawing,{'duration': 847},1,medium,1,1733252163.755
+1733252164.086,Start Drawing,{},1,medium,1,1733252164.086
+1733252165.076,Stop Drawing,{'duration': 990},1,medium,1,1733252165.076
+1733252165.447,Start Drawing,{},1,medium,1,1733252165.447
+1733252166.114,Stop Drawing,{'duration': 667},1,medium,1,1733252166.114
+1733252166.688,Start Drawing,{},1,medium,1,1733252166.688
+1733252167.473,Stop Drawing,{'duration': 785},1,medium,1,1733252167.473
+1733252167.473,Changed Color,{'color': '#00ffff'},1,medium,1,1733252167.473

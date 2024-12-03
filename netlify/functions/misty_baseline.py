@@ -15,7 +15,8 @@ from enum import Enum
 
 # Define constants
 # Base directory for user logs
-USER_LOG_BASE_PATH = "./user_logs"
+USER_LOG_BASE_PATH = "./user_baseline_logs"
+
 
 def generate_unique_id():
     """Generate a random unique ID."""
@@ -121,6 +122,7 @@ app = Flask(__name__)
 # Enable CORS for all routes
 CORS(app)
 
+
 ######################################## BAYESIAN BANDIT SET UP ######################################################
 # Data storage for logging purposes
 user_data = []
@@ -130,16 +132,9 @@ INTERACTIVITY_TIME_WINDOW  = 10  # Time window for interactivity level classific
 PERSONALITY_CHANGE_TIME_WINDOW = 15  # Time window for changing the personality (in seconds)
 
 # Define the two personalities
-personalities = ["Charismatic", "Uncharismatic"]
-
-# Define Arms for Charismatic and Uncharismatic
-arms = [
-    Arm(0, learner=NormalInverseGammaRegressor()),  # Arm for Charismatic (action 0)
-    Arm(1, learner=NormalInverseGammaRegressor())   # Arm for Uncharismatic (action 1)
-]
-
-# Initialize the Contextual Bandit Agent with ThompsonSampling policy
-context_agent = ContextualAgent(arms, ThompsonSampling())
+# Constants
+PERSONALITY_CHARISMATIC = 1
+PERSONALITY_UNCHARISMATIC = 0
 
 contexts = {
     "low": np.array([0.1]),     # Low interactivity
@@ -147,8 +142,15 @@ contexts = {
     "high": np.array([0.9])# High interactivity
 }
 
-        
-######################################## BAYESIAN BANDIT SET UP ######################################################
+
+# Global variables for logging and tracking
+interaction_history = []
+context_label = None
+predicted_arm = None
+reward = None
+last_personality_change_time = None
+last_interactivity_update_time = None
+
 
 ######################################## USER INTERACTION DATA LOGGING #####################################################
 # Use the persistent unique ID to create the file path
@@ -522,9 +524,14 @@ def classify_interactivity_level(action, data, timestamp_seconds, time_window=IN
     else:
         return "medium"
 
-#  Function to update both personality and context simultaneously
-def update_personality_and_context(timestamp_seconds, action, data, last_personality_change_time, last_interactivity_update_time):
-    global context_label, predicted_arm, reward, cumulativeRegret
+
+# Function to handle the random arm selection (baseline)
+def random_arm_selection():
+    return random.choice([PERSONALITY_CHARISMATIC, PERSONALITY_UNCHARISMATIC])
+
+#  Function to update both personality and context (baseline)
+def update_personality_and_context_baseline(timestamp_seconds, action, data, last_personality_change_time, last_interactivity_update_time):
+    global context_label, predicted_arm, reward
 
     # Initialize time-tracking variables
     if context_label is None:
@@ -548,8 +555,8 @@ def update_personality_and_context(timestamp_seconds, action, data, last_persona
         # Update the time after classifying
         last_interactivity_update_time = timestamp_seconds
 
-        # Predict the next arm to play based on the current context
-        predicted_arm, = context_agent.pull(context)
+        # Predict the next arm to play randomly
+        predicted_arm = random_arm_selection()
         print(f"Chosen Arm: {predicted_arm}")
 
         # Choose the new personality based on the predicted arm (for demonstration)
@@ -617,7 +624,7 @@ def log_drawing_data():
         interaction_history.append((timestamp_seconds, action))
        
         #update personality and context at the same time:
-        last_personality_change_time, last_interactivity_update_time, observed_reward, context_label, predicted_arm = update_personality_and_context(timestamp_seconds, action, data, last_personality_change_time, last_interactivity_update_time)
+        last_personality_change_time, last_interactivity_update_time, observed_reward, context_label, predicted_arm = update_personality_and_context_baseline(timestamp_seconds, action, data, last_personality_change_time, last_interactivity_update_time)
         
         print(f"last personality change occured at {last_personality_change_time}")
         print(f"last interactivity time update occured at {last_interactivity_update_time}")
@@ -626,9 +633,6 @@ def log_drawing_data():
         print("Logging drawing data...")
         log_to_csv(data=data, timestamp_in_secs=timestamp_seconds, reward_assignment=observed_reward, context=context_label, arm_selection=predicted_arm)
         
-        # Update the bandit with the predicted arm and the observed reward
-        print(f"Updating contextual bandit: predicted_arm={predicted_arm}, reward={observed_reward}")
-        context_agent.select_for_update(predicted_arm).update(contexts[context_label], observed_reward)
      
     except Exception as e:
         print(f"Error processing data: {e}")
@@ -641,18 +645,3 @@ def log_drawing_data():
 if __name__ == "__main__":
     # start_interaction() # intiialize the misty
     app.run(debug=False, port=80) #flask should listen here
-
-
-
-        # print(f"Recent Actions: {recent_actions}")
-
-    # Calculate context value: average of rewards for recent actions
-    # if recent_actions:
-    #     context_value = sum(action_rewards.get(action, 0) for _, action in recent_actions) / len(recent_actions)
-    # else:
-    #     context_value = 0  # Default to 0 if there are no recent actions
-
-          # if action == "Stop Drawing" and additionalData.get("duration", 0) >= 5000:  # 5 seconds threshold
-        #     reward = 1
-        # else:
-        #     reward = 0

@@ -63,8 +63,33 @@ $(function(){
     ctx.lineJoin="round";
     ctx.lineCap="round";
 
-    //start drawing var
+    // Timer related variables
     let drawStartTime = null;
+    let timerInterval = null;
+    let totalTime = 0; // in seconds
+    const maxTime = 2 * 60; // 5 minutes in seconds
+
+    // Function to start the timer
+    function startTimer() {
+        drawStartTime = Date.now();  // Record the start time
+        timerInterval = setInterval(updateTimer, 1000);  // Update every second
+    }
+
+    // Function to stop the timer
+    function stopTimer() {
+        clearInterval(timerInterval);  // Stop the interval
+    }
+
+    // Function to update the timer and check for timeout
+    function updateTimer() {
+        totalTime = Math.floor((Date.now() - drawStartTime) / 1000);  // Calculate total time
+
+        // If the total time exceeds 5 minutes, stop drawing and show a message
+        if (totalTime >= maxTime) {
+            stopDrawing();  // Stop drawing
+            alert("5 minutes have passed! You are done.");
+        }
+    }
 
     //click inside container
     container.mousedown(function(e){
@@ -74,8 +99,10 @@ $(function(){
         mouse.y=e.pageY-this.offsetTop;
         ctx.moveTo(mouse.x,mouse.y);
 
-        // Start timing
-        drawStartTime = Date.now();
+        // Start the timer when drawing starts
+        if (!timerInterval) {
+            startTimer();
+        }
 
         // log action
         logUserAction("Start Drawing");
@@ -87,13 +114,11 @@ $(function(){
             if(paint_erase=="paint"){
             //get color input
             ctx.strokeStyle=$("#paintColor").val();
-            // var pageCoords = "( " + mouse.x + ", " + mouse.y + " )";
-            // console.log(pageCoords);
+           
         }else{
             //white color
             ctx.strokeStyle="white"
-            // var pageCoords = "( " + mouse.x + ", " + mouse.y + " )";
-            // console.log(pageCoords);
+            
         }
         ctx.lineTo(mouse.x,mouse.y);
         ctx.stroke();
@@ -111,15 +136,6 @@ $(function(){
         }
         paint = false;
 
-    //    paint=false
-
-    //    // calculate duration
-    //    const drawDuration = Date.now() - drawStartTime;
-    //    drawStartTime = null;
-
-
-    //    //log user action
-    //    logUserAction("Stop Drawing", { duration: drawDuration });
     });
     container.mouseleave (function(){
         paint=false
@@ -189,4 +205,15 @@ $(function(){
     
 });
 
+
+
+    //    paint=false
+
+    //    // calculate duration
+    //    const drawDuration = Date.now() - drawStartTime;
+    //    drawStartTime = null;
+
+
+    //    //log user action
+    //    logUserAction("Stop Drawing", { duration: drawDuration });
 
