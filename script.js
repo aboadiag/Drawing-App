@@ -8,7 +8,11 @@ $(function(){
     var mouse={x:0,y:0};
 
     let resetCount = 0; // Reset only once at initialization
-
+    // Timer related variables
+    let drawStartTime = null;
+    let timerInterval = null;
+    let totalTime = 0; // in seconds
+    const maxTime = 2 * 60; // 5 minutes in seconds
 
     // Function to log user actions
     function logUserAction(action, additionalData = {}) {
@@ -63,11 +67,6 @@ $(function(){
     ctx.lineJoin="round";
     ctx.lineCap="round";
 
-    // Timer related variables
-    let drawStartTime = null;
-    let timerInterval = null;
-    let totalTime = 0; // in seconds
-    const maxTime = 2 * 60; // 5 minutes in seconds
 
     // Function to start the timer
     function startTimer() {
@@ -77,9 +76,9 @@ $(function(){
 
     // Function to stop the timer
     function stopTimer() {
-        clearInterval(timerInterval);  // Stop the interval
+        clearInterval(timerInterval);
+        timerInterval = null;  // Ensure no new intervals are started.
     }
-
     // Function to update the timer and check for timeout
     function updateTimer() {
         totalTime = Math.floor((Date.now() - drawStartTime) / 1000);  // Calculate total time
@@ -91,6 +90,13 @@ $(function(){
         }
     }
 
+      // Stop drawing when time is up or user stops
+      function stopDrawing() {
+        paint = false;
+        logUserAction("Stop Drawing", { duration: totalTime });
+        stopTimer();
+    }
+    
     //click inside container
     container.mousedown(function(e){
         paint=true;
