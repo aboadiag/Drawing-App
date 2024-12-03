@@ -577,6 +577,8 @@ def convert_timestamp_to_seconds(timestamp_str):
 
 # -------------------------------------------- HELPER FUNCTIONS -----------------------------------------------------
 
+INTERACTION_THRESHOLD = 2*60  #in seconds
+
 # Define the route for logging user data
 @app.route('/logDrawingData', methods=['POST'])
 def log_drawing_data():
@@ -607,7 +609,12 @@ def log_drawing_data():
             print("Reset Initialized: Reinitializing Misty...")
             initialize_misty()
             return jsonify({"status": "Misty reinitialized"})
-    
+        elif data.get("duration", 0) == INTERACTION_THRESHOLD:
+            # end interaction
+            print("End of Interaction: Reinitializing Misty...")
+            initialize_misty()
+            return jsonify({"status": "Misty homed"})
+
         # Convert the timestamp to seconds since the epoch
         timestamp_seconds = convert_timestamp_to_seconds(timestamp_str)
         # print(f"timestamp_seconds: {timestamp_seconds}")
