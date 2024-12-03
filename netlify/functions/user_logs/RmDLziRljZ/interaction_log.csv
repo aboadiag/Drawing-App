@@ -1,0 +1,16 @@
+timestamp,action,additionalData,ObservedReward,Context,ContextFeatures,ChosenArm,log_timestamp
+1733266648.467,Stop Drawing,{'duration': 528},0,medium,[0.5],1,1733266648.467
+1733266648.467,Start Drawing,{},1,medium,[0.5],1,1733266648.467
+1733266653.443,Start Drawing,{},1,medium,[0.5],1,1733266653.443
+1733266654.367,Stop Drawing,{'duration': 924},1,medium,[0.5],1,1733266654.367
+1733266654.849,Start Drawing,{},1,medium,[0.5],1,1733266654.849
+1733266655.604,Stop Drawing,{'duration': 755},1,medium,[0.5],1,1733266655.604
+1733266662.109,Stop Drawing,{'duration': 284},0,medium,[0.5],0,1733266662.109
+1733266662.391,Start Drawing,{},0,medium,[0.5],0,1733266662.391
+1733266662.391,Start Drawing,{},1,medium,[0.5],0,1733266662.391
+1733266662.944,Stop Drawing,{'duration': 553},1,medium,[0.5],0,1733266662.944
+1733266664.648,Changed Color,{'color': '#ff00ff'},1,medium,[0.5],0,1733266664.648
+1733266664.968,Start Drawing,{},1,medium,[0.5],0,1733266664.968
+1733266665.555,Stop Drawing,{'duration': 587},1,medium,[0.5],0,1733266665.555
+1733266678.049,Start Drawing,{},1,high,[0.9],0,1733266678.049
+1733266682.857,Stop Drawing,{'duration': 4808},1,high,[0.9],0,1733266682.857

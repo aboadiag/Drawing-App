@@ -65,6 +65,7 @@ $(function(){
 
     //start drawing var
     let drawStartTime = null;
+    let continuousDrawInterval = null; // To store the interval ID
 
     //click inside container
     container.mousedown(function(e){
@@ -79,6 +80,14 @@ $(function(){
 
         // log action
         logUserAction("Start Drawing");
+
+        // Start the interval to log continuous drawing
+        continuousDrawInterval = setInterval(function() {
+            if (drawStartTime) {
+                const drawDuration = Date.now() - drawStartTime;
+                logUserAction("Continuous Drawing", { duration: drawDuration });
+            }
+        }, 1000); // Log every second while the mouse is down
     });
     container.mousemove(function(e){
         mouse.x=e.pageX-this.offsetLeft;

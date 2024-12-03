@@ -1,0 +1,31 @@
+timestamp,action,additionalData,ObservedReward,Context,ContextFeatures,ChosenArm,log_timestamp
+1733263837.976,Start Drawing,{},1,high,[0.9],0,1733263837.976
+1733263838.621,Stop Drawing,{'duration': 645},1,high,[0.9],0,1733263838.621
+1733263839.508,Start Drawing,{},1,high,[0.9],0,1733263839.508
+1733263840.444,Stop Drawing,{'duration': 936},1,high,[0.9],0,1733263840.444
+1733263841.174,Start Drawing,{},1,high,[0.9],0,1733263841.174
+1733263842.648,Stop Drawing,{'duration': 1474},1,high,[0.9],0,1733263842.648
+1733263843.455,Start Drawing,{},1,high,[0.9],0,1733263843.455
+1733263844.165,Stop Drawing,{'duration': 710},1,high,[0.9],0,1733263844.165
+1733263845.85,Start Drawing,{},1,high,[0.9],0,1733263845.85
+1733263846.773,Stop Drawing,{'duration': 923},1,high,[0.9],0,1733263846.773
+1733263847.771,Changed Line Width,{'lineWidth': 14},1,high,[0.9],0,1733263847.771
+1733263848.662,Start Drawing,{},1,medium,[0.5],0,1733263848.662
+1733263849.567,Stop Drawing,{'duration': 905},1,medium,[0.5],0,1733263849.567
+1733263853.138,Changed Color,{'color': '#ff00ff'},1,medium,[0.5],0,1733263853.138
+1733263853.713,Start Drawing,{},1,medium,[0.5],0,1733263853.713
+1733263854.559,Stop Drawing,{'duration': 846},1,medium,[0.5],0,1733263854.559
+1733263855.363,Start Drawing,{},1,medium,[0.5],0,1733263855.363
+1733263856.665,Stop Drawing,{'duration': 1303},1,medium,[0.5],0,1733263856.665
+1733263857.302,Start Drawing,{},1,medium,[0.5],0,1733263857.302
+1733263857.753,Stop Drawing,{'duration': 451},1,medium,[0.5],0,1733263857.753
+1733263858.235,Start Drawing,{},1,medium,[0.5],0,1733263858.235
+1733263858.837,Stop Drawing,{'duration': 602},0,medium,[0.5],0,1733263858.837
+1733263860.586,Start Drawing,{},0,medium,[0.5],0,1733263860.586
+1733263861.351,Stop Drawing,{'duration': 765},0,medium,[0.5],0,1733263861.351
+1733263863.809,Changed Line Width,{'lineWidth': 21},0,medium,[0.5],0,1733263863.809
+1733263867.554,Changed Color,{'color': '#980000'},0,medium,[0.5],0,1733263867.554
+1733263868.625,Start Drawing,{},0,medium,[0.5],0,1733263868.625
+1733263869.288,Stop Drawing,{'duration': 663},0,medium,[0.5],0,1733263869.288
+1733263870.945,Start Drawing,{},0,medium,[0.5],0,1733263870.945
+1733263871.895,Stop Drawing,{'duration': 950},0,medium,[0.5],0,1733263871.895

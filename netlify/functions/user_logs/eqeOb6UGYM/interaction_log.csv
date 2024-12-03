@@ -1,0 +1,35 @@
+timestamp,action,additionalData,ObservedReward,Context,ContextFeatures,ChosenArm,log_timestamp
+1733267276.441,Stop Drawing,{'duration': 473},0,low,[0.1],1,1733267276.441
+1733267276.441,Start Drawing,{},1,low,[0.1],1,1733267276.441
+1733267278.577,Start Drawing,{},1,low,[0.1],1,1733267278.577
+1733267279.382,Stop Drawing,{'duration': 805},1,low,[0.1],1,1733267279.382
+1733267291.611,Stop Drawing,{'duration': 242},0,low,[0.1],1,1733267291.611
+1733267291.611,Start Drawing,{},1,low,[0.1],1,1733267291.611
+1733267293.383,Changed Color,{'color': '#ff00ff'},1,low,[0.1],1,1733267293.383
+1733267293.819,Start Drawing,{},1,low,[0.1],1,1733267293.819
+1733267294.541,Stop Drawing,{'duration': 722},1,low,[0.1],1,1733267294.541
+1733267295.267,Start Drawing,{},1,low,[0.1],1,1733267295.267
+1733267296.776,Stop Drawing,{'duration': 1509},1,low,[0.1],1,1733267296.776
+1733267297.519,Start Drawing,{},1,low,[0.1],1,1733267297.519
+1733267297.808,Stop Drawing,{'duration': 289},1,low,[0.1],1,1733267297.808
+1733267298.43,Changed Line Width,{'lineWidth': 22},1,low,[0.1],1,1733267298.43
+1733267300.1,Changed Color,{'color': '#0000ff'},1,low,[0.1],1,1733267300.1
+1733267300.658,Start Drawing,{},1,low,[0.1],1,1733267300.658
+1733267301.707,Stop Drawing,{'duration': 1049},0,low,[0.1],0,1733267301.707
+1733267302.492,Changed Line Width,{'lineWidth': 17},0,low,[0.1],0,1733267302.492
+1733267304.769,Changed Color,{'color': '#ff00ff'},0,low,[0.1],0,1733267304.769
+1733267305.564,Start Drawing,{},0,low,[0.1],0,1733267305.564
+1733267307.37,Stop Drawing,{'duration': 1806},0,low,[0.1],0,1733267307.37
+1733267308.829,Changed Line Width,{'lineWidth': 10},0,low,[0.1],0,1733267308.829
+1733267311.2,Changed Color,{'color': '#4a86e8'},0,low,[0.1],0,1733267311.2
+1733267313.91,Stop Drawing,{'duration': 1869},0,low,[0.1],1,1733267313.91
+1733267314.738,Changed Line Width,{'lineWidth': 19},0,low,[0.1],1,1733267314.738
+1733267316.764,Changed Color,{'color': '#00ff00'},0,low,[0.1],1,1733267316.764
+1733267317.503,Start Drawing,{},0,low,[0.1],1,1733267317.503
+1733267317.503,Start Drawing,{},1,low,[0.1],1,1733267317.503
+1733267319.447,Stop Drawing,{'duration': 1944},1,low,[0.1],1,1733267319.447
+1733267320.276,Reset Canvas,{'resetCount': 1},1,low,[0.1],1,1733267320.276
+1733267321.309,Changed Line Width,{'lineWidth': 15},1,low,[0.1],1,1733267321.309
+1733267324.214,Start Drawing,{},1,high,[0.9],1,1733267324.214
+1733267325.982,Stop Drawing,{'duration': 1768},1,high,[0.9],1,1733267325.982
+1733267325.982,Changed Color,{'color': '#9900ff'},1,high,[0.9],1,1733267325.982

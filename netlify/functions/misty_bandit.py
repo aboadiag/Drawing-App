@@ -433,7 +433,7 @@ def initialize_misty():
 # ------------------- CHANGING MISTY'S PERSONA ------------------------------------ #
 ######################################## MISTY HELPER FUNCTIONS ######################################################
 # Constants
-DRAW_THRESHOLD = 10  # Duration threshold for "high interactivity" (in seconds)
+DRAW_THRESHOLD = 10  # Duration threshold for "high interactivity" (in ms)
 DRAW_THRESHOLD_med = 5
 RESET_THRESHOLD = 2  # Reset count threshold for "low interactivity"
 # INTERACTIVITY_TIME_WINDOW = 30  # Time window for recent action evaluation (in seconds)
@@ -445,9 +445,9 @@ RESET_THRESHOLD = 2  # Reset count threshold for "low interactivity"
 user_actions = [
     "Reset Canvas", "Start Drawing", "Stop Drawing",
     "Canvas Saved", "Switched to Erase", "Switched to Paint",
-    "Changed Color", "Changed Line Width"
+    "Changed Color", "Changed Line Width", "Continuous Drawing",
 ]
-interactive = ["Start Drawing", "Switched to Paint", "Changed Color",
+interactive = ["Continuous Drawing", "Start Drawing", "Switched to Paint", "Changed Color",
                                     "Switched to Erase", "Canvas Saved", "Changed Line Width"]
 not_interactive = ["Stop Drawing", "Reset Canvas"]
 
@@ -466,28 +466,48 @@ def classify_interactivity_level(action, data, timestamp_seconds, time_window=IN
     """
 
     if action == "Stop Drawing":
-        duration = data.get("duration", 0)
+        # Extract duration from additionalData
+        additionalData = data.get("additionalData", {})
+        duration = additionalData.get("duration", 0)  # Default to 0 if not present
+        print(f"Stop Drawing duration: {duration}")
+
+        # duration = data.get("duration", 0)
+        # print(f"stop drawing duration {duration}")
         if duration >= DRAW_THRESHOLD: # idle for more than 10s
-          print("action: stop drawing")
           return "low" 
         elif duration == DRAW_THRESHOLD_med:
-            print("action: stop drawing")
             return "medium"
+        elif duration < DRAW_THRESHOLD:
+            return "high"
+        
 
     #drawing thresholds
-    elif action == "Start Drawing":
-        duration = data.get("duration", 0)
-        if duration >= DRAW_THRESHOLD: #drawing for more than 10s
-            print("action: start drawing")
+    if action == "Continuous Drawing":
+        # Extract duration from additionalData
+        additionalData = data.get("additionalData", {})
+        duration = additionalData.get("duration", 0)  # Default to 0 if not present
+        print(f"Continuous Drawing duration: {duration}")
+
+        # duration = data.get("duration", 0)
+        # print(f"start drawing duration {duration}")
+        if duration >= DRAW_THRESHOLD_med:
             return "high"
-        elif duration == DRAW_THRESHOLD_med:
-            print("action: start drawing")
-            return "medium"
+
+
+   
+    # elif action == "Start Drawing":
+    #     duration = data.get("duration", 0)
+    #     if duration >= DRAW_THRESHOLD: #drawing for more than 10s
+    #         print("action: start drawing")
+    #         return "high"
+    #     elif duration == DRAW_THRESHOLD_med:
+    #         print("action: start drawing")
+    #         return "medium"
 
     elif action == "Reset Canvas":
         reset_count = data.get("resetCount", 0)
         if reset_count >= RESET_THRESHOLD:
-            print("action: reset canvas")
+            # print("action: reset canvas")
             return "low" 
 
     # Filter actions within the time window
@@ -528,13 +548,13 @@ def update_personality_and_context(timestamp_seconds, action, data, last_persona
 
     # Initialize time-tracking variables
     if context_label is None:
-        print("initializing context_label...")
+        # print("initializing context_label...")
         context_label = 0  
     if predicted_arm is None:
-        print("initializing predicted_arm...")
+        # print("initializing predicted_arm...")
         predicted_arm = 0 
     if reward is None:
-        print("initializing reward...")
+        # print("initializing reward...")
         reward = 0       
         
     # Classify the interactivity level and assign rewards after interaction delay
@@ -559,7 +579,9 @@ def update_personality_and_context(timestamp_seconds, action, data, last_persona
 
         # Observe the reward
         reward = 1 if action in interactive else 0
-        print(f"Reward assigned: {reward}")
+        # print(f"Reward assigned: {reward}")
+        print(f"Action: {action}, observed Reward: {reward}")
+
 
     else:
         print(f"Waiting for {INTERACTIVITY_TIME_WINDOW - (timestamp_seconds - last_interactivity_update_time):.2f} more seconds to classify context.")
@@ -577,7 +599,6 @@ def convert_timestamp_to_seconds(timestamp_str):
 
 # -------------------------------------------- HELPER FUNCTIONS -----------------------------------------------------
 
-INTERACTION_THRESHOLD = 2*60  #in seconds
 
 # Define the route for logging user data
 @app.route('/logDrawingData', methods=['POST'])
@@ -589,15 +610,15 @@ def log_drawing_data():
     try:
         # Initialize time-tracking variables if needed
         if last_personality_change_time is None:
-            print("initializing personality time change")
+            # print("initializing personality time change")
             last_personality_change_time = 0  # Initial timestamp (e.g., start of interaction)
         if last_interactivity_update_time is None:
-            print("initializing interactivity update time")
+            # print("initializing interactivity update time")
             last_interactivity_update_time = 0  # Initialize last interactivity update time
             # collect data from client (with user interactions)
 
         data = request.json
-        print(f"Raw data: {data}")
+        # print(f"Raw data: {data}")
         action = data.get("action")
         timestamp_str = data.get("timestamp")
 
@@ -606,15 +627,10 @@ def log_drawing_data():
 
         if action == "Reset Initialized":
             # Reset Misty to initial state
-            print("Reset Initialized: Reinitializing Misty...")
+            # print("Reset Initialized: Reinitializing Misty...")
             initialize_misty()
             return jsonify({"status": "Misty reinitialized"})
-        elif data.get("duration", 0) == INTERACTION_THRESHOLD:
-            # end interaction
-            print("End of Interaction: Reinitializing Misty...")
-            initialize_misty()
-            return jsonify({"status": "Misty homed"})
-
+        
         # Convert the timestamp to seconds since the epoch
         timestamp_seconds = convert_timestamp_to_seconds(timestamp_str)
         # print(f"timestamp_seconds: {timestamp_seconds}")
@@ -631,7 +647,7 @@ def log_drawing_data():
 
         #  Only log the reward and update the contextual bandit once the reward is assigned
         print("Logging drawing data...")
-        log_to_csv(data=data, timestamp_in_secs=timestamp_seconds, reward_assignment=observed_reward, context=context_label, arm_selection=predicted_arm)
+        log_to_csv(data=data, timestamp_in_secs=timestamp_seconds, reward_assignment=observed_reward, context_label=context_label, arm_selection=predicted_arm)
         
         # Update the bandit with the predicted arm and the observed reward
         print(f"Updating contextual bandit: predicted_arm={predicted_arm}, reward={observed_reward}")
