@@ -112,9 +112,16 @@ $(function(){
         ctx.moveTo(mouse.x,mouse.y);
 
         // Start the timer when drawing starts
-        if (!timerInterval) {
-            startTimer();
+        // if (!timerInterval) {
+        //     startTimer();
+        // }
+            // Reset timer-related variables before starting a new session
+        if (timerInterval) {
+            stopTimer();  // Ensure previous timer is cleared
         }
+
+        // Start the timer for this drawing session
+        startTimer();
 
         // log action
         logUserAction("Start Drawing");
