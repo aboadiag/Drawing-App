@@ -88,7 +88,7 @@ $(function(){
         // If the total time exceeds 5 minutes, stop drawing and show a message
         if (totalTime >= maxTime && !alertShown) {
             stopDrawing();  // Stop drawing
-            alert("5 minutes have passed! You are done.");
+            alert("1 minutes have passed! You are done.");
             alertShown = true;  // Prevent further alerts
 
         }
@@ -153,6 +153,8 @@ $(function(){
         paint = false;
 
     });
+
+
     container.mouseleave (function(){
         paint=false
      });
