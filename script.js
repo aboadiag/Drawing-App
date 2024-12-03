@@ -90,18 +90,18 @@ $(function(){
             stopDrawing();  // Stop drawing
             alert("1 minutes have passed! You are done.");
             alertShown = true;  // Prevent further alerts
-
-        }
-    }
-
-      // Stop drawing when time is up or user stops
-      function stopDrawing() {
-        if (drawStartTime) {
-            paint = false;
-            logUserAction("End Interaction", { duration: totalTime });
             stopTimer();
         }
     }
+
+    //   // Stop drawing when time is up or user stops
+    //   function stopDrawing() {
+    //     if (drawStartTime) {
+    //         paint = false;
+    //         logUserAction("End Interaction", { duration: totalTime });
+    //         stopTimer();
+    //     }
+    // }
 
     /* start drawing */
     container.mousedown(function(e){
