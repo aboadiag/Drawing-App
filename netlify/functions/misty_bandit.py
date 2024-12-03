@@ -524,7 +524,7 @@ def classify_interactivity_level(action, data, timestamp_seconds, time_window=IN
 
 #  Function to update both personality and context simultaneously
 def update_personality_and_context(timestamp_seconds, action, data, last_personality_change_time, last_interactivity_update_time):
-    global context_label, predicted_arm, reward, cumulativeRegret
+    global context_label, predicted_arm, reward
 
     # Initialize time-tracking variables
     if context_label is None:

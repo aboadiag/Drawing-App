@@ -73,6 +73,8 @@ $(function(){
             stopDrawing();  // Stop drawing
             alert("5 minutes have passed! You are done.");
             alertShown = true;  // Prevent further alerts
+            console.log("Alert shown");  // Add this log to verify alert is triggered
+
         }
     }
 
