@@ -8,12 +8,6 @@ $(function(){
     var mouse={x:0,y:0};
 
     let resetCount = 0; // Reset only once at initialization
-    // Timer related variables
-    let drawStartTime = null;
-    let timerInterval = null;
-    let totalTime = 0; // in seconds
-    const maxTime = 1 * 60; // 5 minutes in seconds
-    let alertShown = false;
 
 
     // Function to log user actions
@@ -69,41 +63,10 @@ $(function(){
     ctx.lineJoin="round";
     ctx.lineCap="round";
 
+    //start drawing var
+    let drawStartTime = null;
 
-    // Function to start the timer
-    function startTimer() {
-        drawStartTime = Date.now();  // Record the start time
-        timerInterval = setInterval(updateTimer, 1000);  // Update every second
-    }
-
-    // Function to stop the timer
-    function stopTimer() {
-        clearInterval(timerInterval);
-        timerInterval = null;  // Ensure no new intervals are started.
-    }
-    // Function to update the timer and check for timeout
-    function updateTimer() {
-        totalTime = Math.floor((Date.now() - drawStartTime) / 1000);  // Calculate total time
-
-        // If the total time exceeds 5 minutes, stop drawing and show a message
-        if (totalTime >= maxTime && !alertShown) {
-            stopDrawing();  // Stop drawing
-            alert("1 minutes have passed! You are done.");
-            alertShown = true;  // Prevent further alerts
-            stopTimer();
-        }
-    }
-
-      // Stop drawing when time is up or user stops
-      function stopDrawing() {
-        if (drawStartTime) {
-            paint = false;
-            logUserAction("End Interaction", { duration: totalTime });
-            // stopTimer();
-        }
-    }
-
-    /* start drawing */
+    //click inside container
     container.mousedown(function(e){
         paint=true;
         ctx.beginPath();
@@ -111,25 +74,12 @@ $(function(){
         mouse.y=e.pageY-this.offsetTop;
         ctx.moveTo(mouse.x,mouse.y);
 
-        // Start the timer when drawing starts
-        // if (!timerInterval) {
-        //     startTimer();
-        // }
-            // Reset timer-related variables before starting a new session
-        if (timerInterval) {
-            stopTimer();  // Ensure previous timer is cleared
-        }
-
-        // Start the timer for this drawing session
-        startTimer();
+        // Start timing
+        drawStartTime = Date.now();
 
         // log action
         logUserAction("Start Drawing");
-
-        // Reset alert state when user starts a new drawing session
-        alertShown = false; // Allow the alert to be shown again after the next timer expiration
     });
-
     container.mousemove(function(e){
         mouse.x=e.pageX-this.offsetLeft;
         mouse.y=e.pageY-this.offsetTop;
@@ -137,11 +87,13 @@ $(function(){
             if(paint_erase=="paint"){
             //get color input
             ctx.strokeStyle=$("#paintColor").val();
-           
+            // var pageCoords = "( " + mouse.x + ", " + mouse.y + " )";
+            // console.log(pageCoords);
         }else{
             //white color
             ctx.strokeStyle="white"
-            
+            // var pageCoords = "( " + mouse.x + ", " + mouse.y + " )";
+            // console.log(pageCoords);
         }
         ctx.lineTo(mouse.x,mouse.y);
         ctx.stroke();
@@ -159,9 +111,16 @@ $(function(){
         }
         paint = false;
 
+    //    paint=false
+
+    //    // calculate duration
+    //    const drawDuration = Date.now() - drawStartTime;
+    //    drawStartTime = null;
+
+
+    //    //log user action
+    //    logUserAction("Stop Drawing", { duration: drawDuration });
     });
-
-
     container.mouseleave (function(){
         paint=false
      });
@@ -174,12 +133,8 @@ $(function(){
          paint_erase="paint";
          $("#erase").removeClass("eraseMode");
 
-        // Log reset action
-        logUserAction("Reset Canvas", { resetCount: resetCount });
-
-        // Allow alerts to show again after reset
-        alertShown = false;
-            
+         // log user action
+         logUserAction("Reset Canvas", { resetCount: resetCount });
      });
 
      //save button
@@ -228,7 +183,7 @@ $(function(){
             $("#circle").width(ui.value);
             ctx.lineWidth=ui.value;
             logUserAction(`Changed Line Width`, {lineWidth : ui.value});
-
+            
         }
     });
     
