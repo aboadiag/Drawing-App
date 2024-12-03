@@ -488,10 +488,13 @@ def classify_interactivity_level(action, data, timestamp_seconds, time_window=IN
         duration = additionalData.get("duration", 0)  # Default to 0 if not present
         print(f"Continuous Drawing duration: {duration}")
 
-        # duration = data.get("duration", 0)
-        # print(f"start drawing duration {duration}")
-        if duration >= DRAW_THRESHOLD_med:
+       # Adjust classification thresholds for continuous drawing
+        if duration >= DRAW_THRESHOLD:  # Consider longer continuous drawing as "high"
             return "high"
+        elif duration == DRAW_THRESHOLD_med:  # Consider medium as longer than 5 seconds
+            return "medium"
+        elif duration < DRAW_THRESHOLD:
+            return "low"
 
 
    

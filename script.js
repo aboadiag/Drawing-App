@@ -96,13 +96,11 @@ $(function(){
             if(paint_erase=="paint"){
             //get color input
             ctx.strokeStyle=$("#paintColor").val();
-            // var pageCoords = "( " + mouse.x + ", " + mouse.y + " )";
-            // console.log(pageCoords);
+
         }else{
             //white color
             ctx.strokeStyle="white"
-            // var pageCoords = "( " + mouse.x + ", " + mouse.y + " )";
-            // console.log(pageCoords);
+
         }
         ctx.lineTo(mouse.x,mouse.y);
         ctx.stroke();
@@ -118,20 +116,24 @@ $(function(){
         } else {
             logUserAction("Stop Drawing", { duration: 0 });
         }
+
+        // Stop the interval when the mouse is released
+        if (continuousDrawInterval) {
+            clearInterval(continuousDrawInterval);
+            continuousDrawInterval = null;
+        }
+        
         paint = false;
 
-    //    paint=false
-
-    //    // calculate duration
-    //    const drawDuration = Date.now() - drawStartTime;
-    //    drawStartTime = null;
-
-
-    //    //log user action
-    //    logUserAction("Stop Drawing", { duration: drawDuration });
     });
+
     container.mouseleave (function(){
         paint=false
+        // Clear interval if the mouse leaves the canvas area
+        if (continuousDrawInterval) {
+            clearInterval(continuousDrawInterval);
+            continuousDrawInterval = null;
+        }
      });
 
 
@@ -197,3 +199,14 @@ $(function(){
     });
     
 });
+
+
+    //    paint=false
+
+    //    // calculate duration
+    //    const drawDuration = Date.now() - drawStartTime;
+    //    drawStartTime = null;
+
+
+    //    //log user action
+    //    logUserAction("Stop Drawing", { duration: drawDuration });
