@@ -7,6 +7,9 @@ $(function(){
     var container=$("#container");
     var mouse={x:0,y:0};
 
+    let resetCount = 0; // Reset only once at initialization
+
+
     // Function to log user actions
     function logUserAction(action, additionalData = {}) {
         const timestamp = new Date().toISOString();
@@ -38,6 +41,7 @@ $(function(){
         });
     }
 
+
     // Clear stored canvas data and reset the canvas when the page loads
     localStorage.removeItem("imgCanvas");  // Remove saved canvas data
    // Reset the canvas when the page loads
@@ -59,6 +63,9 @@ $(function(){
     ctx.lineJoin="round";
     ctx.lineCap="round";
 
+    //start drawing var
+    let drawStartTime = null;
+
     //click inside container
     container.mousedown(function(e){
         paint=true;
@@ -66,6 +73,10 @@ $(function(){
         mouse.x=e.pageX-this.offsetLeft;
         mouse.y=e.pageY-this.offsetTop;
         ctx.moveTo(mouse.x,mouse.y);
+
+        // Start timing
+        drawStartTime = Date.now();
+
         // log action
         logUserAction("Start Drawing");
     });
@@ -89,23 +100,41 @@ $(function(){
     }
     });
     
+    // stop drawing event
     container.mouseup(function(){
-       paint=false
-       //log user action
-       logUserAction("Stop Drawing");
+        if (drawStartTime) {
+            const drawDuration = Date.now() - drawStartTime;
+            drawStartTime = null;
+            logUserAction("Stop Drawing", { duration: drawDuration });
+        } else {
+            logUserAction("Stop Drawing", { duration: 0 });
+        }
+        paint = false;
+
+    //    paint=false
+
+    //    // calculate duration
+    //    const drawDuration = Date.now() - drawStartTime;
+    //    drawStartTime = null;
+
+
+    //    //log user action
+    //    logUserAction("Stop Drawing", { duration: drawDuration });
     });
     container.mouseleave (function(){
         paint=false
      });
 
+
      //reset button
      $("#reset").click(function(){
+        resetCount++; //increment everytime its reset
          ctx.clearRect(0,0,canvas.width,canvas.height);
-
          paint_erase="paint";
          $("#erase").removeClass("eraseMode");
+
          // log user action
-         logUserAction("Reset Canvas");
+         logUserAction("Reset Canvas", { resetCount: resetCount });
      });
 
      //save button

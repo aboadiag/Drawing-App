@@ -135,9 +135,9 @@ interactive = ["Start Drawing", "Switched to Paint", "Changed Color",
                                     "Switched to Erase", "Canvas Saved", "Changed Line Width"]
 not_interactive = ["Stop Drawing", "Reset Canvas"]
 
-interaction_history = deque(maxlen=10)  # Each entry in the deque will be a tuple (timestamp_seconds, interaction_value): Store timestamps and interactivity scores (1 or 0)
+interaction_history = deque()  # Each entry in the deque will be a tuple (timestamp_seconds, interaction_value): Store timestamps and interactivity scores (1 or 0)
 INTERACTIVITY_TIME_WINDOW  = 10  # Time window for interactivity level classification (in seconds)
-PERSONALITY_CHANGE_TIME_WINDOW = 20  # Time window for changing the personality (in seconds)
+PERSONALITY_CHANGE_TIME_WINDOW = 15  # Time window for changing the personality (in seconds)
 
 # Define the two personalities
 personalities = ["Charismatic", "Uncharismatic"]
@@ -168,38 +168,50 @@ def get_user_log_path():
     """
     unique_id = global_unique_id  # Using the global unique ID
     # start_interaction(unique_id) # intiialize the misty
-    time.sleep(5)
+    # time.sleep(5)
     print(f"The unique ID is:{unique_id}")
+
     user_log_path = os.path.join(USER_LOG_BASE_PATH, unique_id)
+    # print(f"User log path (before normalization): {user_log_path}")
+    
+    # Normalize the path to handle OS-specific separators
+    user_log_path = os.path.normpath(user_log_path)
+    # print(f"User log path (after normalization): {user_log_path}")
+
     os.makedirs(user_log_path, exist_ok=True)  # Ensure the directory exists
     return os.path.join(user_log_path, "interaction_log.csv")  # Return full file path
 
-# Initialize the log file (only creates the file if it doesn't exist)
-def initialize_log_file():
-    log_file_path = get_user_log_path()
-    if not os.path.exists(log_file_path):
-        with open(log_file_path, mode='w', newline='') as file:
-            writer = csv.DictWriter(file, fieldnames=[
-                'timestamp', 'action', 'reward_assignment', 'context', 'arm_selection', 'log_timestamp'
-            ])
-            writer.writeheader()
-
 # Log data into the user-specific CSV file
-def log_to_csv(data, reward_assignment=None, context=None, arm_selection=None):
+def log_to_csv(data, timestamp_in_secs, reward_assignment=None, context=None, arm_selection=None):
     """
     Log the action interaction to a CSV file with additional metadata.
     """
     log_file_path = get_user_log_path()
-    log_timestamp = timestamp_to_iso(data['timestamp'])  # Convert timestamp to ISO format
+
+    # Initialize the log file if it doesn't exist
+    if not os.path.exists(log_file_path):
+        try:
+            with open(log_file_path, mode='w', newline='') as file:
+                writer = csv.DictWriter(file, fieldnames=[
+                    'timestamp', 'action', ' additional_data', 'reward_assignment', 'context', 'arm_selection', 'log_timestamp'
+                ])
+                writer.writeheader()
+                print(f"Log file initialized: {log_file_path}")
+        except Exception as e:
+            print(f"Error initializing log file: {e}")
+
+    # log_timestamp = timestamp_to_iso(data['timestamp'])  # Convert timestamp to ISO format
+    log_timestamp = timestamp_in_secs
 
     # Log data including all the necessary fields
     with open(log_file_path, mode='a', newline='') as file:
         writer = csv.DictWriter(file, fieldnames=[
-            'timestamp', 'action', 'reward_assignment', 'context', 'arm_selection', 'log_timestamp'
+            'timestamp', 'action', ' additional_data', 'reward_assignment', 'context', 'arm_selection', 'log_timestamp'
         ])
         writer.writerow({
-            'timestamp': data['timestamp'],
+            'timestamp': timestamp_in_secs,
             'action': data['action'],
+            'additional_data': data['additionalData'],
             # 'interaction_value': data['interaction_value'],
             'reward_assignment': reward_assignment,
             'context': context,
@@ -207,6 +219,7 @@ def log_to_csv(data, reward_assignment=None, context=None, arm_selection=None):
             'log_timestamp': log_timestamp
         })
     print("Logged interaction data to CSV.")
+
 
 # Convert timestamp to ISO format
 def timestamp_to_iso(timestamp):
@@ -230,8 +243,8 @@ INTERACTIVITY_HIGH = "high"
 
 # Define a circular queue for personality changes with a fixed size
 class CircularQueue:
-    def __init__(self, max_size):
-        self.queue = deque(maxlen=max_size)
+    def __init__(self):
+        self.queue = deque() # Use a deque without maxlen for indefinite size
     
     def enqueue(self, item):
         if item not in [PERSONALITY_CHARISMATIC, PERSONALITY_UNCHARISMATIC]:
@@ -247,7 +260,7 @@ class CircularQueue:
         return len(self.queue) == 0
     
 # Create a queue with a size of 2 (Charismatic and Uncharismatic)
-personality_queue = CircularQueue(max_size=2)
+personality_queue = CircularQueue()
 
 # Constants
 # PERSONALITY_CHANGE_TIME_WINDOW = 20  # Example window of 60 seconds
@@ -259,7 +272,11 @@ personality_queue = CircularQueue(max_size=2)
     # Track the last interaction time and last personality change time
 last_interactivity_update_time = None  # Timestamp of the last interactivity update
 last_personality_change_time = None  # Timestamp of the last personality change
-
+context_label = None
+predicted_arm = None
+reward = None
+# Global flag to track Misty's execution state
+misty_action_in_progress = False
 
 # Update the Misty expressions and actions based on the current personality
 def update_misty_personality(current_personality):
@@ -286,28 +303,6 @@ def update_misty_personality(current_personality):
 #     """Returns the time in seconds since the last personality change."""
 #     print(f"Time elapsed: {timestamp_seconds - last_personality_change_time}")
 #     return timestamp_seconds - last_personality_change_time
-
-# Function to handle queuing of personality changes
-def maybe_queue_personality_change(new_personality, personality_queue, timestamp_seconds, last_personality_change_time):
-    """Only enqueues the personality change if enough time has passed."""
-    # Example logic
-    if last_personality_change_time is None:
-        print("Initializing last_personality_change_time for the first time.")
-        last_personality_change_time = timestamp_seconds
- 
-    delta_t = timestamp_seconds - last_personality_change_time
-    print(f"Time elapsed: {delta_t}")
-
-    if delta_t >= PERSONALITY_CHANGE_TIME_WINDOW:
-        personality_queue.enqueue(new_personality)
-        print(f"Personality change enqueued: {new_personality}")
-        print(f"Current Personality Queue: {list(personality_queue.queue)}")
-
-
-        last_personality_change_time = timestamp_seconds  # Update the last change time
-        print(f"last personality change at {last_personality_change_time}")
-    else:
-        print(f"Not enough time has passed. Time since last change: {delta_t} seconds.")
 
 def play_audio_on_misty(file_url, volume=DEFAULT_VOLUME):
     print("Playing audio on misty...")
@@ -448,36 +443,85 @@ def move_arms_on_misty(arm_data):
     return jsonify({"status": "success", "message": "Action processed and Arms moved"}), 200
 
 def initialize_misty():
-#  play_audio_on_misty()
- change_led_on_misty(default_led) 
- change_misty_face(default_face)
- move_misty_head(default_head)
- move_arms_on_misty(default_arms)
+    change_led_on_misty(default_led) 
+    change_misty_face(default_face)
+    move_misty_head(default_head)
+    move_arms_on_misty(default_arms)
 
 
 # ------------------- CHANGING MISTY'S PERSONA ------------------------------------ #
 ######################################## MISTY HELPER FUNCTIONS ######################################################
+# Constants
+DRAW_THRESHOLD = 10  # Duration threshold for "high interactivity" (in seconds)
+DRAW_THRESHOLD_med = 5
+RESET_THRESHOLD = 2  # Reset count threshold for "low interactivity"
+INTERACTIVITY_TIME_WINDOW = 30  # Time window for recent action evaluation (in seconds)
 
 ######################################## BAYESIAN BANDIT HELPER FUNCTIONS ######################################################
 
+
 # Function to classify the interaction context
-def classify_interactivity_level(timestamp_seconds):
+def classify_interactivity_level(action, data, timestamp_seconds, time_window=INTERACTIVITY_TIME_WINDOW):
     # Consider the last 10 actions for recent context
-    recent_actions = list(interaction_history)[-10:] #make a list and get
-    
+    # recent_actions = list(interaction_history)[-10:] #make a list and get
+    """
+    Classify the level of interactivity based on the recent actions in the specified time window.
+    Parameters:
+    - timestamp_seconds (float): Current timestamp in seconds.
+    - time_window (int): Time window in seconds to evaluate recent actions.
+
+    Returns:
+    - str: Interactivity level ('high', 'medium', 'low').
+    """
+
+    if action == "Stop Drawing":
+        duration = data.get("duration", 0)
+        if duration >= DRAW_THRESHOLD: # idle for more than 10s
+          print("action: stop drawing")
+          return "low" 
+        elif duration == DRAW_THRESHOLD_med:
+            print("action: stop drawing")
+            return "medium"
+
+    #drawing thresholds
+    elif action == "Start Drawing":
+        duration = data.get("duration", 0)
+        if duration >= DRAW_THRESHOLD: #drawing for more than 10s
+            print("action: start drawing")
+            return "high"
+        elif duration == DRAW_THRESHOLD_med:
+            print("action: start drawing")
+            return "medium"
+
+    elif action == "Reset Canvas":
+        reset_count = data.get("resetCount", 0)
+        if reset_count >= RESET_THRESHOLD:
+            print("action: reset canvas")
+            return "low" 
+
+    # Filter actions within the time window
+    recent_actions = []
+    for entry in interaction_history:
+        try:
+            ts, action = entry  # Unpack each entry
+            if timestamp_seconds - ts <= time_window:
+                recent_actions.append((timestamp_seconds, action))
+        except ValueError as e:
+            print(f"Error unpacking entry {entry}: {e}")
+            continue  # Skip malformed entries
+
     # Define action rewards: assign weights to interactive and non-interactive actions
-    action_rewards = {
-        action: 1 for action in interactive
-    }
-    action_rewards.update({
-        action: 0 for action in not_interactive
-    })
-    
-    # Calculate context value: average of rewards for recent actions
+    action_rewards = {action: 1 for action in interactive}
+    action_rewards.update({action: 0 for action in not_interactive})
+
     if recent_actions:
-        context_value = sum(action_rewards[action] for _, action in recent_actions) / len(recent_actions)
+        print(f"Action contributions to context value:")
+        for _, action in recent_actions:
+            print(f"Action: {action}, Reward: {action_rewards.get(action, 0)}")
+        context_value = sum(action_rewards.get(action, 0) for _, action in recent_actions) / len(recent_actions)
+        print(f"Computed context value: {context_value}")
     else:
-        context_value = 0  # Default to 0 if there are no recent actions
+        print("No recent actions found.")
     
     # Classify interactivity level based on context value thresholds
     if context_value >= 0.8:  # High interactivity threshold
@@ -486,6 +530,51 @@ def classify_interactivity_level(timestamp_seconds):
         return "low"
     else:
         return "medium"
+
+#  Function to update both personality and context simultaneously
+def update_personality_and_context(timestamp_seconds, action, last_personality_change_time, last_interactivity_update_time):
+    global context_label, predicted_arm, reward
+
+    # Initialize time-tracking variables
+    if context_label is None:
+        print("initializing context_label...")
+        context_label = 0  
+    if predicted_arm is None:
+        print("initializing predicted_arm...")
+        predicted_arm = 0 
+    if reward is None:
+        print("initializing reward...")
+        reward = 0       
+        
+    # Classify the interactivity level and assign rewards after interaction delay
+    print("Classifying interactivity and assigning rewards")
+    if timestamp_seconds - last_interactivity_update_time >= INTERACTIVITY_TIME_WINDOW:
+
+        print(f"Classified context is: {context_label}")
+        context_label = classify_interactivity_level(timestamp_seconds)
+        context = contexts[context_label]  # Set the current context (low, medium, high)
+
+        # Update the time after classifying
+        last_interactivity_update_time = timestamp_seconds
+
+        # Predict the next arm to play based on the current context
+        predicted_arm, = context_agent.pull(context)
+        print(f"Chosen Arm: {predicted_arm}")
+
+        # Choose the new personality based on the predicted arm (for demonstration)
+        new_personality = PERSONALITY_CHARISMATIC if predicted_arm == 1 else PERSONALITY_UNCHARISMATIC
+        update_misty_personality(new_personality)  # Update personality based on reward
+        last_personality_change_time = timestamp_seconds  # Update last change time
+
+        # Observe the reward
+        reward = 1 if action in interactive else 0
+        print(f"Reward assigned: {reward}")
+
+    else:
+        print(f"Waiting for {INTERACTIVITY_TIME_WINDOW - (timestamp_seconds - last_interactivity_update_time):.2f} more seconds to classify context.")
+
+    return last_personality_change_time, last_interactivity_update_time, reward, context_label, predicted_arm
+
 
 # Helper function to convert timestamp to seconds since the epoch
 def convert_timestamp_to_seconds(timestamp_str):
@@ -496,43 +585,6 @@ def convert_timestamp_to_seconds(timestamp_str):
 ######################################## BAYESIAN BANDIT HELPER FUNCTIONS ######################################################
 
 # -------------------------------------------- HELPER FUNCTIONS -----------------------------------------------------
-# Global flag to track Misty's execution state
-misty_action_in_progress = False
-
-def execute_misty_action(personality_queue):
-    global misty_action_in_progress
-    
-    if misty_action_in_progress:
-        # Skip if Misty is already performing an action
-        print("Misty is still executing an action. Waiting...")
-        return
-    
-    if personality_queue.is_empty():
-        #Choose the new personality based on the predicted arm (for demonstration)
-        new_personality = PERSONALITY_CHARISMATIC if predicted_arm == 1 else PERSONALITY_UNCHARISMATIC
-        maybe_queue_personality_change(new_personality, personality_queue, timestamp_seconds, last_personality_change_time)
-
-
-    # If no action is in progress, proceed to dequeue and execute
-    if not personality_queue.is_empty():
-        current_personality = personality_queue.dequeue()
-        print(f"Dequeued personality: {current_personality}")
-        misty_action_in_progress = True  # Set the flag
-        
-        # Call Misty actions
-        try:
-            print("Proceed with Misty personality change...")
-            update_misty_personality(current_personality)
-        except Exception as e:
-            print(f"Error executing Misty action: {e}")
-            misty_action_in_progress = False  # Reset flag on failure
-            return
-
-        # Once actions complete, reset the flag
-        misty_action_in_progress = False
-        print("Misty action completed. Ready for the next action.")
-    else:
-        print("No actions in the queue.")
 
 first_interaction = True
 # Main loop that runs before handling the drawing data
@@ -546,69 +598,65 @@ def main_loop():
 
 # Define the route for logging user data
 @app.route('/logDrawingData', methods=['POST'])
-def log_drawing_data(): 
-    global first_interaction
+def log_drawing_data():
+    #init misty 
+    # main_loop()
     global last_interactivity_update_time, last_personality_change_time  # Track time for both windows
-    global context, predicted_arm
+    global context_label, predicted_arm, observed_reward
     global timestamp_seconds
-    # global last_chosen_arm
-    main_loop()
 
-    # Initialize time-tracking variables if needed
-    if last_personality_change_time is None:
-        print("initializing personality time change")
-        last_personality_change_time = 0  # Initial timestamp (e.g., start of interaction)
-    if last_interactivity_update_time is None:
-        print("initializing interactivity update time")
-        last_interactivity_update_time = 0  # Initialize last interactivity update time
+    # global last_chosen_arm
     
     try:
-        # collect data from client (with user interactions)
+        # Initialize time-tracking variables if needed
+        if last_personality_change_time is None:
+            print("initializing personality time change")
+            last_personality_change_time = 0  # Initial timestamp (e.g., start of interaction)
+        if last_interactivity_update_time is None:
+            print("initializing interactivity update time")
+            last_interactivity_update_time = 0  # Initialize last interactivity update time
+            # collect data from client (with user interactions)
 
         data = request.json
-        print(f"Raw payload: {request.data}")  # See the raw request body
-        print(f"Parsed JSON: {data}") 
-
+        # print(f"Raw data: {data}")
         action = data.get("action")
         timestamp_str = data.get("timestamp")
-        print(f"Received Action: {action} at {timestamp_str}")
+        additionalData = data.get("additionalData", {})
+        # print(f"Received Action: {action} at {timestamp_str}")
+
+        if action == "Reset Initialized":
+            # Reset Misty to initial state
+            print("Reset Initialized: Reinitializing Misty...")
+            initialize_misty()
+            return jsonify({"status": "Misty reinitialized"})
+        
+        if action == "Stop Drawing" and additionalData.get("duration", 0) >= 5000:  # 5 seconds threshold
+            reward = 1
+        else:
+            reward = 0
+        
 
         # Convert the timestamp to seconds since the epoch
         timestamp_seconds = convert_timestamp_to_seconds(timestamp_str)
-        print(f"timestamp_seconds: {timestamp_seconds}")
+        # print(f"timestamp_seconds: {timestamp_seconds}")
 
-        #save user interactions (i.e. "actions") and timestamp
+        
+        # Save user interactions (i.e. "actions") and timestamp
         interaction_history.append((timestamp_seconds, action))
+       
+        #update personality and context at the same time:
+        last_personality_change_time, last_interactivity_update_time, observed_reward, context_label, predicted_arm = update_personality_and_context(timestamp_seconds, action, last_personality_change_time, last_interactivity_update_time)
+        
+        print(f"last personality change occured at {last_personality_change_time}")
+        print(f"last interactivity time update occured at {last_interactivity_update_time}")
 
-        # Classify the interactivity level based on recent actions
-        context_label = classify_interactivity_level(timestamp_seconds)
-        context = contexts[context_label]  # Set the current context (low, medium, high)
-        last_interactivity_update_time = timestamp_seconds  # Update the time after classifying
-        # print(f"Context is: {context_label}")
-        print(f"what is the context: {context}")
-
-        # Assign rewards: interaction_value          
-        reward = 1 if action in interactive else 0
-        print(f"reward value is {reward}")
-
-        #predict the next arm to play
-        predicted_arm, = context_agent.pull(context)
-        print(f"Chosen Arm: {predicted_arm}")
-
-        # print(f"Timestamps seconds that have passed {timestamp_seconds}")
-
-        # check when its time to execute
-        execute_misty_action(personality_queue)
-
-        # Update the last personality change time
-        # last_personality_change_time = timestamp_seconds  
-        # print(f"last personality change at {last_personality_change_time}")
-
-        # Update the bandit with the predicted arm to update with context and the observed reward
-        context_agent.select_for_update(predicted_arm).update(context, reward)
-
-    # Log the arm selection after the agent's decision
-    # log_to_csv(data, reward_assignment=reward, context=context_label, arm_selection=predicted_arm)
+        #  Only log the reward and update the contextual bandit once the reward is assigned
+        print("Logging drawing data...")
+        log_to_csv(data=data, timestamp_in_secs=timestamp_seconds, reward_assignment=observed_reward, context=context_label, arm_selection=predicted_arm)
+        
+        # Update the bandit with the predicted arm and the observed reward
+        print(f"Updating contextual bandit: predicted_arm={predicted_arm}, reward={observed_reward}")
+        context_agent.select_for_update(predicted_arm).update(contexts[context_label], observed_reward)
      
     except Exception as e:
         print(f"Error processing data: {e}")
@@ -621,3 +669,13 @@ def log_drawing_data():
 if __name__ == "__main__":
     # start_interaction() # intiialize the misty
     app.run(debug=False, port=80) #flask should listen here
+
+
+
+        # print(f"Recent Actions: {recent_actions}")
+
+    # Calculate context value: average of rewards for recent actions
+    # if recent_actions:
+    #     context_value = sum(action_rewards.get(action, 0) for _, action in recent_actions) / len(recent_actions)
+    # else:
+    #     context_value = 0  # Default to 0 if there are no recent actions

@@ -1,0 +1,4 @@
+timestamp,action,reward_assignment,context,arm_selection,log_timestamp
+1733192320.68,Start Drawing,0,high,0,1733192320.68
+1733192336.945,Start Drawing,0,medium,0,1733192336.945
+1733192339.448,Changed Color,0,medium,1,1733192339.448
