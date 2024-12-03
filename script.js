@@ -13,6 +13,8 @@ $(function(){
     let timerInterval = null;
     let totalTime = 0; // in seconds
     const maxTime = 2 * 60; // 5 minutes in seconds
+    let alertShown = false;
+
 
     // Function to log user actions
     function logUserAction(action, additionalData = {}) {
@@ -84,9 +86,11 @@ $(function(){
         totalTime = Math.floor((Date.now() - drawStartTime) / 1000);  // Calculate total time
 
         // If the total time exceeds 5 minutes, stop drawing and show a message
-        if (totalTime >= maxTime) {
+        if (totalTime >= maxTime && !alertShown) {
             stopDrawing();  // Stop drawing
             alert("5 minutes have passed! You are done.");
+            alertShown = true;  // Prevent further alerts
+
         }
     }
 
@@ -96,7 +100,7 @@ $(function(){
         logUserAction("Stop Drawing", { duration: totalTime });
         stopTimer();
     }
-    
+
     //click inside container
     container.mousedown(function(e){
         paint=true;
