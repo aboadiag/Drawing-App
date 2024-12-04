@@ -1,0 +1,14 @@
+timestamp,log_timestamp,Action_T_Rews,ActionNow,additionalData,ObservedReward,Context,ContextFeatures,ChosenArm
+1733346339.321,1733346339.321,Continuous Drawing,,{'duration': 507},1,medium,[0.5],1
+1733346339.321,1733346339.321,Continuous Drawing,,{'duration': 507},1,medium,[0.5],1
+1733346338.814,1733346338.814,Start Drawing,,{},1,medium,[0.5],1
+1733346339.321,1733346339.321,Start Drawing,,{},1,medium,[0.5],1
+1733346339.618,1733346339.618,Stop Drawing,,{'duration': 804},1,medium,[0.5],1
+1733346340.025,1733346340.025,Start Drawing,,{},1,medium,[0.5],1
+1733346340.529,1733346340.529,Continuous Drawing,,{'duration': 504},1,medium,[0.5],1
+1733346340.7,1733346340.7,Stop Drawing,,{'duration': 675},1,medium,[0.5],1
+1733346341.007,1733346341.007,Start Drawing,,{},1,medium,[0.5],1
+1733346341.51,1733346341.51,Continuous Drawing,,{'duration': 503},1,medium,[0.5],1
+1733346342.011,1733346342.011,Continuous Drawing,,{'duration': 1004},1,medium,[0.5],1
+1733346342.257,1733346342.257,Stop Drawing,,{'duration': 1250},1,medium,[0.5],1
+1733346343.071,1733346343.071,Changed Line Width,,{'lineWidth': 19},1,medium,[0.5],1

@@ -1,7 +1,0 @@
-timestamp,action,reward_assignment,context,arm_selection,log_timestamp
-1733246602.291,Start Drawing,1,medium,1,1733246602.291
-1733246602.291,Stop Drawing,0,medium,1,1733246602.291
-1733246614.118,Start Drawing,1,medium,1,1733246614.118
-1733246615.161,Start Drawing,1,medium,1,1733246615.161
-1733246615.665,Stop Drawing,1,medium,1,1733246615.665
-1733246615.665,Stop Drawing,0,medium,1,1733246615.665

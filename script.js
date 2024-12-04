@@ -1,5 +1,5 @@
 $(function(){
-    const BASE_URL = "https://a64d-128-237-82-208.ngrok-free.app"; // changed? dynamic public url! CHANGE EVERYTIME NGROK RESTARTS!
+    const BASE_URL = "https://b4be-128-237-82-142.ngrok-free.app"; // changed? dynamic public url! CHANGE EVERYTIME NGROK RESTARTS!
     var paint=false;
     var paint_erase="paint";
     var canvas=document.getElementById("paint");
@@ -7,6 +7,10 @@ $(function(){
     var container=$("#container");
     var mouse={x:0,y:0};
 
+    // Global variables to track drawing state
+    let drawStartTime = null; // To store the start time of drawing
+    let continuousDrawStartTime = null; // To store the start time for continuous drawing
+    let continuousDrawInterval = null; // To store the interval ID for continuous drawing logging
     let resetCount = 0; // Reset only once at initialization
 
 
@@ -64,10 +68,10 @@ $(function(){
     ctx.lineCap="round";
 
     //start drawing var
-    let drawStartTime = null;
-    let continuousDrawInterval = null; // To store the interval ID
+    // let drawStartTime = null;
+    // let continuousDrawInterval = null; // To store the interval ID
 
-    //click inside container
+    // // Mouse events for drawing --> click inside container
     container.mousedown(function(e){
         paint=true;
         ctx.beginPath();
@@ -75,8 +79,9 @@ $(function(){
         mouse.y=e.pageY-this.offsetTop;
         ctx.moveTo(mouse.x,mouse.y);
 
-        // Start timing
+        // Start timing for both the drawing and continuous drawing
         drawStartTime = Date.now();
+        continuousDrawStartTime = Date.now(); // Start the continuous drawing timer
 
         // log action
         logUserAction("Start Drawing");
@@ -110,19 +115,25 @@ $(function(){
     // stop drawing event
     container.mouseup(function(){
         if (drawStartTime) {
+           // Calculate the total drawing duration from the start of drawing
             const drawDuration = Date.now() - drawStartTime;
-            drawStartTime = null;
+            // drawStartTime = null;
+
             logUserAction("Stop Drawing", { duration: drawDuration });
+
+            // Stop the interval when the mouse is released
+            if (continuousDrawInterval) {
+                clearInterval(continuousDrawInterval);
+                continuousDrawInterval = null;
+            }
+            // Reset the timers
+            drawStartTime = null;
+            continuousDrawStartTime = null;
+
         } else {
             logUserAction("Stop Drawing", { duration: 0 });
         }
 
-        // Stop the interval when the mouse is released
-        if (continuousDrawInterval) {
-            clearInterval(continuousDrawInterval);
-            continuousDrawInterval = null;
-        }
-        
         paint = false;
 
     });

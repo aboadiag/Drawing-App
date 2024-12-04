@@ -1,3 +1,0 @@
-timestamp,action,reward_assignment,context,arm_selection,log_timestamp
-1733187504.498,Start Drawing,0,high,0,1733187504.498
-1733187505.012,Stop Drawing,,medium,0,1733187505.012

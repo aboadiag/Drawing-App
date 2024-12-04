@@ -172,7 +172,7 @@ def get_user_log_path():
     return os.path.join(user_log_path, "interaction_log.csv")  # Return full file path
 
 # Log data into the user-specific CSV file
-def log_to_csv(data, timestamp_in_secs, reward_assignment=None, context_label=None, arm_selection=None):
+def log_to_csv(data, timestamp_in_secs, Action_T_Rews=None, ActionNow=None, reward_assignment=None, context_label=None, arm_selection=None):
     """
     Log the action interaction to a CSV file with additional metadata.
     """
@@ -183,7 +183,7 @@ def log_to_csv(data, timestamp_in_secs, reward_assignment=None, context_label=No
         try:
             with open(log_file_path, mode='w', newline='') as file:
                 writer = csv.DictWriter(file, fieldnames=[
-                    'timestamp', 'action', 'additionalData', 'ObservedReward', 'Context', 'ContextFeatures', 'ChosenArm', 'log_timestamp'
+                    'timestamp', 'log_timestamp', 'Action_T_Rews', 'ActionNow', 'additionalData', 'ObservedReward', 'Context', 'ContextFeatures', 'ChosenArm'
                 ])
                 writer.writeheader()
                 print(f"Log file initialized: {log_file_path}")
@@ -196,17 +196,18 @@ def log_to_csv(data, timestamp_in_secs, reward_assignment=None, context_label=No
     # Log data including all the necessary fields
     with open(log_file_path, mode='a', newline='') as file:
         writer = csv.DictWriter(file, fieldnames=[
-                    'timestamp', 'action', 'additionalData', 'ObservedReward', 'Context', 'ContextFeatures', 'ChosenArm', 'log_timestamp'
+            'timestamp', 'log_timestamp', 'Action_T_Rews', 'ActionNow', 'additionalData', 'ObservedReward', 'Context', 'ContextFeatures', 'ChosenArm',
         ])
         writer.writerow({
             'timestamp': timestamp_in_secs,
-            'action': data['action'],
+            'log_timestamp': log_timestamp,
+            'Action_T_Rews': Action_T_Rews,
+            'ActionNow': ActionNow,
             'additionalData': data['additionalData'],
             'ObservedReward': reward_assignment,
             'Context': context_label,
             'ContextFeatures': contexts[context_label],
             'ChosenArm': arm_selection,
-            'log_timestamp': log_timestamp
         })
     print("Logged interaction data to CSV.")
 
@@ -433,8 +434,9 @@ def initialize_misty():
 # ------------------- CHANGING MISTY'S PERSONA ------------------------------------ #
 ######################################## MISTY HELPER FUNCTIONS ######################################################
 # Constants
-DRAW_THRESHOLD = 10000  # Duration threshold for "high interactivity" (in ms)
-DRAW_THRESHOLD_med = 5000
+LONG_IDLE_THRESHOLD = 10000  # Duration threshold for "high interactivity" (in ms)
+STOP_DRAWING_THRESHOLD = 5000
+CONT_DRAWING_THRESHOLD = 1000
 RESET_THRESHOLD = 2  # Reset count threshold for "low interactivity"
 # INTERACTIVITY_TIME_WINDOW = 30  # Time window for recent action evaluation (in seconds)
 
@@ -451,10 +453,9 @@ interactive = ["Continuous Drawing", "Start Drawing", "Switched to Paint", "Chan
                                     "Switched to Erase", "Canvas Saved", "Changed Line Width"]
 not_interactive = ["Stop Drawing", "Reset Canvas"]
 
+
 # Function to classify the interaction context
 def classify_interactivity_level(action, data, timestamp_seconds, time_window=INTERACTIVITY_TIME_WINDOW):
-    # Consider the last 10 actions for recent context
-    # recent_actions = list(interaction_history)[-10:] #make a list and get
     """
     Classify the level of interactivity based on the recent actions in the specified time window.
     Parameters:
@@ -464,45 +465,93 @@ def classify_interactivity_level(action, data, timestamp_seconds, time_window=IN
     Returns:
     - str: Interactivity level ('high', 'medium', 'low').
     """
+    # Handle missing duration in the action data
+    duration = get_duration_from_data(data)
+    if duration is None:
+        return classify_based_on_history(timestamp_seconds, time_window) #default
 
+    # Handle each type of action
     if action == "Stop Drawing":
-        # Extract duration from additionalData
-        additionalData = data.get("additionalData", {})
-        duration = additionalData.get("duration", 0)  # Default to 0 if not present
-        print(f"Stop Drawing duration: {duration}")
+        #check if continuous drawing or not
+        return classify_stop_drawing(duration)
 
-        # duration = data.get("duration", 0)
-        # print(f"stop drawing duration {duration}")
-        if duration >= DRAW_THRESHOLD: # idle for more than 10s
-          return "low" 
-        elif duration >= DRAW_THRESHOLD_med:
-            return "medium"
-        elif duration <= DRAW_THRESHOLD_med:
-            return "high"
-        
-
-    #drawing thresholds
-    if action == "Continuous Drawing":
-        # Extract duration from additionalData
-        additionalData = data.get("additionalData", {})
-        duration = additionalData.get("duration", 0)  # Default to 0 if not present
-        print(f"Continuous Drawing duration: {duration}")
-
-       # Adjust classification thresholds for continuous drawing
-        if duration >= DRAW_THRESHOLD:  # Consider longer continuous drawing as "high"
-            return "high"
-        elif duration >= DRAW_THRESHOLD_med:  # Consider medium as longer than 5 seconds
-            return "medium"
-        else:
-            return "low"
+    elif action == "Start Drawing":
+        return handle_start_cont_drawing(action, duration)
+    
+    elif action == "Continuous Drawing":
+        return classify_continuous_drawing(duration)
 
     elif action == "Reset Canvas":
-        reset_count = data.get("resetCount", 0)
-        if reset_count >= RESET_THRESHOLD:
-            # print("action: reset canvas")
-            return "low" 
+        return handle_reset_canvas(data)
 
-    # Filter actions within the time window
+    # Default classification based on historical data and recent actions
+    return classify_based_on_history(timestamp_seconds, time_window)
+
+def get_duration_from_data(data):
+    """Extracts the duration from the additionalData."""
+    additionalData = data.get("additionalData", {})
+    duration = additionalData.get("duration", None)  # Default to None if not present
+    print(f"Extracted duration: {duration}")
+    return duration
+
+def classify_stop_drawing(duration):
+    """Classify context for 'Stop Drawing' based on duration."""
+    print(f"Stop Drawing duration: {duration}")
+
+    if duration >= LONG_IDLE_THRESHOLD:  # Idle for more than 10s
+        return "low"
+    elif duration >= STOP_DRAWING_THRESHOLD & duration < LONG_IDLE_THRESHOLD:
+        return "medium"
+    else:
+        return "high"
+
+def classify_continuous_drawing(duration):
+    """Classify context for 'Continuous Drawing' based on duration."""
+    print(f"Continuous Drawing duration: {duration}")
+
+    # Adjust classification thresholds for continuous drawing
+    if duration >= STOP_DRAWING_THRESHOLD:  # Consider longer continuous drawing as "high"
+        return "high"
+    elif duration >= CONT_DRAWING_THRESHOLD & duration < STOP_DRAWING_THRESHOLD:  # Consider medium as longer than 5 seconds
+        return "medium"
+    elif duration < CONT_DRAWING_THRESHOLD:
+        return "low"
+
+def handle_start_cont_drawing(action, duration):
+    """Handle the 'Start Drawing' action."""
+    if action == "Continuous Drawing":
+        # print(f"Start Drawing - Resetting classification to 'low'")
+        print(f"Start Drawing - Resetting classification  'Continuous drawing'")
+        return classify_continuous_drawing(duration)
+    
+    return "low"  # Reset to low, since it's the beginning of a new action
+
+def handle_reset_canvas(data):
+    """Handle the 'Reset Canvas' action."""
+    reset_count = data.get("resetCount", 0)
+    if reset_count >= RESET_THRESHOLD:
+        print("Reset Canvas action - marking as low interactivity")
+        return "low"
+    return None
+
+def classify_based_on_history(timestamp_seconds, time_window):
+    """Classify context based on historical actions within the time window."""
+
+    recent_actions = get_recent_actions(timestamp_seconds, time_window)
+    context_value = calculate_context_value(recent_actions)
+    
+    print(f"Computed context value: {context_value}")
+    
+    # Classify interactivity level based on context value thresholds
+    if context_value >= 0.8:  # High interactivity threshold
+        return "high"
+    elif context_value <= 0.2:  # Low interactivity threshold
+        return "low"
+    else:
+        return "medium"
+
+def get_recent_actions(timestamp_seconds, time_window):
+    """Filter actions within the time window."""
     recent_actions = []
     for entry in interaction_history:
         try:
@@ -512,27 +561,25 @@ def classify_interactivity_level(action, data, timestamp_seconds, time_window=IN
         except ValueError as e:
             print(f"Error unpacking entry {entry}: {e}")
             continue  # Skip malformed entries
+    return recent_actions
 
-    # Define action rewards: assign weights to interactive and non-interactive actions
+def calculate_context_value(recent_actions):
+    """Calculate the context value based on recent actions."""
     action_rewards = {action: 1 for action in interactive}
     action_rewards.update({action: 0 for action in not_interactive})
 
+    context_value = 0
     if recent_actions:
         print(f"Action contributions to context value:")
         for _, action in recent_actions:
-            print(f"Action: {action}, Reward: {action_rewards.get(action, 0)}")
-        context_value = sum(action_rewards.get(action, 0) for _, action in recent_actions) / len(recent_actions)
-        print(f"Computed context value: {context_value}")
+            reward = action_rewards.get(action, 0)
+            print(f"Action: {action}, Reward: {reward}")
+            context_value += reward
+
+        context_value /= len(recent_actions)
     else:
         print("No recent actions found.")
-    
-    # Classify interactivity level based on context value thresholds
-    if context_value >= 0.8:  # High interactivity threshold
-        return "high"
-    elif context_value <= 0.2:  # Low interactivity threshold
-        return "low"
-    else:
-        return "medium"
+    return context_value
 
 #  Function to update both personality and context simultaneously
 def update_personality_and_context(timestamp_seconds, action, data, last_personality_change_time, last_interactivity_update_time):
@@ -565,15 +612,22 @@ def update_personality_and_context(timestamp_seconds, action, data, last_persona
         print(f"Chosen Arm: {predicted_arm}")
 
         # Choose the new personality based on the predicted arm (for demonstration)
-        new_personality = PERSONALITY_CHARISMATIC if predicted_arm == 1 else PERSONALITY_UNCHARISMATIC
+        new_personality = PERSONALITY_CHARISMATIC if predicted_arm == 0 else PERSONALITY_UNCHARISMATIC
         update_misty_personality(new_personality)  # Update personality based on reward
         last_personality_change_time = timestamp_seconds  # Update last change time
 
-        # Observe the reward
+        # Observe the reward of the context and action
         reward = 1 if action in interactive else 0
-        # print(f"Reward assigned: {reward}")
+
         print(f"Action: {action}, observed Reward: {reward}")
 
+        # Update the bandit with the predicted arm and the observed reward
+        print(f"Updating contextual bandit: predicted_arm={predicted_arm}, reward={reward}")
+        context_agent.select_for_update(predicted_arm).update(contexts[context_label], reward)
+
+        #  Only log the reward and update the contextual bandit once the reward is assigned
+        print("Logging drawing data...")
+        log_to_csv(data=data, timestamp_in_secs=timestamp_seconds, Action_T_Rews=action, ActionNow=None, reward_assignment=reward, context_label=context_label, arm_selection=predicted_arm)
 
     else:
         print(f"Waiting for {INTERACTIVITY_TIME_WINDOW - (timestamp_seconds - last_interactivity_update_time):.2f} more seconds to classify context.")
@@ -639,11 +693,8 @@ def log_drawing_data():
 
         #  Only log the reward and update the contextual bandit once the reward is assigned
         print("Logging drawing data...")
-        log_to_csv(data=data, timestamp_in_secs=timestamp_seconds, reward_assignment=observed_reward, context_label=context_label, arm_selection=predicted_arm)
-        
-        # Update the bandit with the predicted arm and the observed reward
-        print(f"Updating contextual bandit: predicted_arm={predicted_arm}, reward={observed_reward}")
-        context_agent.select_for_update(predicted_arm).update(contexts[context_label], observed_reward)
+        log_to_csv(data=data, timestamp_in_secs= timestamp_seconds, Action_T_Rews=None, ActionNow=action, reward_assignment=observed_reward, context_label=context_label, arm_selection=predicted_arm)
+
      
     except Exception as e:
         print(f"Error processing data: {e}")
