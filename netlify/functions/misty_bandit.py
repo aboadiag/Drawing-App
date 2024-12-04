@@ -433,8 +433,8 @@ def initialize_misty():
 # ------------------- CHANGING MISTY'S PERSONA ------------------------------------ #
 ######################################## MISTY HELPER FUNCTIONS ######################################################
 # Constants
-DRAW_THRESHOLD = 10  # Duration threshold for "high interactivity" (in ms)
-DRAW_THRESHOLD_med = 5
+DRAW_THRESHOLD = 10000  # Duration threshold for "high interactivity" (in ms)
+DRAW_THRESHOLD_med = 5000
 RESET_THRESHOLD = 2  # Reset count threshold for "low interactivity"
 # INTERACTIVITY_TIME_WINDOW = 30  # Time window for recent action evaluation (in seconds)
 
@@ -475,9 +475,9 @@ def classify_interactivity_level(action, data, timestamp_seconds, time_window=IN
         # print(f"stop drawing duration {duration}")
         if duration >= DRAW_THRESHOLD: # idle for more than 10s
           return "low" 
-        elif duration == DRAW_THRESHOLD_med:
+        elif duration >= DRAW_THRESHOLD_med:
             return "medium"
-        elif duration < DRAW_THRESHOLD:
+        elif duration <= DRAW_THRESHOLD_med:
             return "high"
         
 
@@ -491,21 +491,10 @@ def classify_interactivity_level(action, data, timestamp_seconds, time_window=IN
        # Adjust classification thresholds for continuous drawing
         if duration >= DRAW_THRESHOLD:  # Consider longer continuous drawing as "high"
             return "high"
-        elif duration == DRAW_THRESHOLD_med:  # Consider medium as longer than 5 seconds
+        elif duration >= DRAW_THRESHOLD_med:  # Consider medium as longer than 5 seconds
             return "medium"
-        elif duration < DRAW_THRESHOLD:
+        else:
             return "low"
-
-
-   
-    # elif action == "Start Drawing":
-    #     duration = data.get("duration", 0)
-    #     if duration >= DRAW_THRESHOLD: #drawing for more than 10s
-    #         print("action: start drawing")
-    #         return "high"
-    #     elif duration == DRAW_THRESHOLD_med:
-    #         print("action: start drawing")
-    #         return "medium"
 
     elif action == "Reset Canvas":
         reset_count = data.get("resetCount", 0)
@@ -682,3 +671,16 @@ if __name__ == "__main__":
         #     reward = 1
         # else:
         #     reward = 0
+
+
+        
+
+   
+    # elif action == "Start Drawing":
+    #     duration = data.get("duration", 0)
+    #     if duration >= DRAW_THRESHOLD: #drawing for more than 10s
+    #         print("action: start drawing")
+    #         return "high"
+    #     elif duration == DRAW_THRESHOLD_med:
+    #         print("action: start drawing")
+    #         return "medium"

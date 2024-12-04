@@ -1,0 +1,43 @@
+timestamp,action,additionalData,ObservedReward,Context,ContextFeatures,ChosenArm,log_timestamp
+1733270145.131,Stop Drawing,{'duration': 449},0,high,[0.9],0,1733270145.131
+1733270145.131,Start Drawing,{},1,high,[0.9],0,1733270145.131
+1733270202.544,Stop Drawing,{'duration': 652},0,high,[0.9],0,1733270202.544
+1733270202.544,Start Drawing,{},1,high,[0.9],0,1733270202.544
+1733270203.101,Start Drawing,{},1,high,[0.9],0,1733270203.101
+1733270203.598,Stop Drawing,{'duration': 497},1,high,[0.9],0,1733270203.598
+1733270215.868,Continuous Drawing,{'duration': 1007},1,low,[0.1],0,1733270215.868
+1733270216.27,Stop Drawing,{'duration': 1409},1,low,[0.1],0,1733270216.27
+1733270216.27,Start Drawing,{},1,low,[0.1],0,1733270216.27
+1733270222.335,Changed Line Width,{'lineWidth': 16},1,low,[0.1],0,1733270222.335
+1733270223.097,Start Drawing,{},1,low,[0.1],0,1733270223.097
+1733270224.102,Continuous Drawing,{'duration': 1005},1,low,[0.1],0,1733270224.102
+1733270224.453,Stop Drawing,{'duration': 1356},1,low,[0.1],0,1733270224.453
+1733270225.455,Start Drawing,{},1,medium,[0.5],0,1733270225.455
+1733270226.456,Continuous Drawing,{'duration': 1001},1,medium,[0.5],0,1733270226.456
+1733270226.893,Stop Drawing,{'duration': 1438},1,medium,[0.5],0,1733270226.893
+1733270237.991,Continuous Drawing,{'duration': 1003},1,low,[0.1],1,1733270237.991
+1733270238.16,Stop Drawing,{'duration': 1172},1,low,[0.1],1,1733270238.16
+1733270242.816,Start Drawing,{},1,low,[0.1],1,1733270242.816
+1733270242.816,Start Drawing,{},1,low,[0.1],1,1733270242.816
+1733270243.825,Continuous Drawing,{'duration': 1009},1,low,[0.1],1,1733270243.825
+1733270244.822,Continuous Drawing,{'duration': 2006},1,low,[0.1],1,1733270244.822
+1733270245.826,Continuous Drawing,{'duration': 3010},1,low,[0.1],1,1733270245.826
+1733270246.82,Continuous Drawing,{'duration': 4004},1,low,[0.1],1,1733270246.82
+1733270252.871,Start Drawing,{},1,high,[0.9],0,1733270252.871
+1733270252.871,Stop Drawing,{'duration': 4674},0,high,[0.9],0,1733270252.871
+1733270253.877,Continuous Drawing,{'duration': 1006},0,high,[0.9],0,1733270253.877
+1733270254.879,Continuous Drawing,{'duration': 2008},0,high,[0.9],0,1733270254.879
+1733270255.879,Continuous Drawing,{'duration': 3008},0,high,[0.9],0,1733270255.879
+1733270256.878,Continuous Drawing,{'duration': 4007},0,high,[0.9],0,1733270256.878
+1733270257.877,Continuous Drawing,{'duration': 5006},1,medium,[0.5],0,1733270257.877
+1733270258.877,Continuous Drawing,{'duration': 6006},1,medium,[0.5],0,1733270258.877
+1733270259.877,Continuous Drawing,{'duration': 7006},1,medium,[0.5],0,1733270259.877
+1733270260.88,Continuous Drawing,{'duration': 8009},1,medium,[0.5],0,1733270260.88
+1733270261.877,Continuous Drawing,{'duration': 9006},1,medium,[0.5],0,1733270261.877
+1733270261.948,Stop Drawing,{'duration': 9077},1,medium,[0.5],0,1733270261.948
+1733270267.0,Start Drawing,{},1,medium,[0.5],0,1733270267.0
+1733270268.892,Stop Drawing,{'duration': 1892},0,high,[0.9],0,1733270268.892
+1733270268.892,Continuous Drawing,{'duration': 1004},1,high,[0.9],0,1733270268.892
+1733270276.237,Start Drawing,{},1,high,[0.9],0,1733270276.237
+1733270277.242,Continuous Drawing,{'duration': 1005},1,high,[0.9],0,1733270277.242
+1733270277.581,Stop Drawing,{'duration': 1344},1,high,[0.9],0,1733270277.581

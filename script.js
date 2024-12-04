@@ -87,7 +87,7 @@ $(function(){
                 const drawDuration = Date.now() - drawStartTime;
                 logUserAction("Continuous Drawing", { duration: drawDuration });
             }
-        }, 1000); // Log every second while the mouse is down
+        }, 500); // Log every half second while the mouse is down
     });
     container.mousemove(function(e){
         mouse.x=e.pageX-this.offsetLeft;
