@@ -1,0 +1,12 @@
+timestamp,log_timestamp,Action_T_Rews,ActionNow,additionalData,ObservedReward,Context,ContextFeatures,ChosenArm
+1733346509.153,1733346509.153,Stop Drawing,,{'duration': 430},0,medium,[0.5],1
+1733346509.153,1733346509.153,Stop Drawing,,{'duration': 430},0,medium,[0.5],1
+1733346508.723,1733346508.723,Start Drawing,,{},1,medium,[0.5],1
+1733346509.153,1733346509.153,Start Drawing,,{},1,medium,[0.5],1
+1733346509.606,1733346509.606,Start Drawing,,{},1,medium,[0.5],1
+1733346510.058,1733346510.058,Stop Drawing,,{'duration': 452},1,medium,[0.5],1
+1733346510.416,1733346510.416,Start Drawing,,{},1,medium,[0.5],1
+1733346510.922,1733346510.922,Continuous Drawing,,{'duration': 506},1,medium,[0.5],1
+1733346511.073,1733346511.073,Stop Drawing,,{'duration': 657},1,medium,[0.5],1
+1733346511.97,1733346511.97,Start Drawing,,{},1,medium,[0.5],1
+1733346512.336,1733346512.336,Stop Drawing,,{'duration': 366},1,medium,[0.5],1

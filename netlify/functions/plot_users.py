@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 file_path_bandit_participant1 = './user_logs/yKDX3owrsw/interaction_log.csv'
 df = pd.read_csv(file_path_bandit_participant1)
 
+# file_path_bandit_participant2 = './user_baseline_logs/vCnNkzyNmQ/interaction_log.csv'
+# df = pd.read_csv(file_path_bandit_participant2)
 
 # --------------------- EMPIRICAL REWARD PROBS -------------------------------------------------
 

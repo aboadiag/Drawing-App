@@ -1,0 +1,432 @@
+timestamp,log_timestamp,Action_T_Rews,ActionNow,additionalData,ObservedReward,Context,ContextFeatures,ChosenArm
+1733346913.141,1733346913.141,Changed Color,,{'color': '#ff0000'},1,high,[0.9],1
+1733346913.141,1733346913.141,Changed Color,,{'color': '#ff0000'},1,high,[0.9],1
+1733346921.132,1733346921.132,Changed Color,,{'color': '#ff00ff'},1,high,[0.9],1
+1733346933.454,1733346933.454,Start Drawing,,{},1,high,[0.9],1
+1733346933.454,1733346933.454,Start Drawing,,{},1,high,[0.9],1
+1733346933.955,1733346933.955,Continuous Drawing,,{'duration': 501},1,high,[0.9],1
+1733346934.456,1733346934.456,Continuous Drawing,,{'duration': 1002},1,high,[0.9],1
+1733346934.955,1733346934.955,Continuous Drawing,,{'duration': 1501},1,high,[0.9],1
+1733346935.456,1733346935.456,Continuous Drawing,,{'duration': 2002},1,high,[0.9],1
+1733346935.97,1733346935.97,Continuous Drawing,,{'duration': 2516},1,high,[0.9],1
+1733346936.404,1733346936.404,Stop Drawing,,{'duration': 2950},1,high,[0.9],1
+1733346936.836,1733346936.836,Start Drawing,,{},1,high,[0.9],1
+1733346937.344,1733346937.344,Continuous Drawing,,{'duration': 508},1,high,[0.9],1
+1733346937.849,1733346937.849,Continuous Drawing,,{'duration': 1013},1,high,[0.9],1
+1733346938.347,1733346938.347,Continuous Drawing,,{'duration': 1511},1,high,[0.9],1
+1733346938.836,1733346938.836,Continuous Drawing,,{'duration': 2000},1,high,[0.9],1
+1733346939.336,1733346939.336,Continuous Drawing,,{'duration': 2500},1,high,[0.9],1
+1733346933.455,1733346933.455,Changed Color,,{'color': '#d411d4'},1,high,[0.9],1
+1733346939.336,1733346939.336,Changed Color,,{'color': '#d411d4'},1,high,[0.9],1
+1733346939.836,1733346939.836,Continuous Drawing,,{'duration': 3000},1,high,[0.9],1
+1733346940.349,1733346940.349,Continuous Drawing,,{'duration': 3513},1,high,[0.9],1
+1733346940.837,1733346940.837,Continuous Drawing,,{'duration': 4001},1,high,[0.9],1
+1733346941.337,1733346941.337,Continuous Drawing,,{'duration': 4501},1,high,[0.9],1
+1733346941.838,1733346941.838,Continuous Drawing,,{'duration': 5002},1,high,[0.9],1
+1733346942.336,1733346942.336,Continuous Drawing,,{'duration': 5500},1,high,[0.9],1
+1733346942.838,1733346942.838,Continuous Drawing,,{'duration': 6002},1,high,[0.9],1
+1733346943.291,1733346943.291,Stop Drawing,,{'duration': 6455},1,high,[0.9],1
+1733346944.673,1733346944.673,Continuous Drawing,,{'duration': 500},1,medium,[0.5],0
+1733346944.673,1733346944.673,Continuous Drawing,,{'duration': 500},1,medium,[0.5],0
+1733346945.174,1733346945.174,Continuous Drawing,,{'duration': 1001},1,medium,[0.5],0
+1733346945.675,1733346945.675,Continuous Drawing,,{'duration': 1502},1,medium,[0.5],0
+1733346946.186,1733346946.186,Continuous Drawing,,{'duration': 2013},1,medium,[0.5],0
+1733346946.688,1733346946.688,Continuous Drawing,,{'duration': 2515},1,medium,[0.5],0
+1733346947.176,1733346947.176,Continuous Drawing,,{'duration': 3003},1,medium,[0.5],0
+1733346947.686,1733346947.686,Continuous Drawing,,{'duration': 3512},1,medium,[0.5],0
+1733346948.177,1733346948.177,Continuous Drawing,,{'duration': 4004},1,medium,[0.5],0
+1733346948.681,1733346948.681,Continuous Drawing,,{'duration': 4508},1,medium,[0.5],0
+1733346949.051,1733346949.051,Stop Drawing,,{'duration': 4878},1,medium,[0.5],0
+1733346944.173,1733346944.173,Start Drawing,,{},1,medium,[0.5],0
+1733346949.051,1733346949.051,Start Drawing,,{},1,medium,[0.5],0
+1733346950.876,1733346950.876,Switched to Erase,,{},1,medium,[0.5],0
+1733346951.947,1733346951.947,Changed Line Width,,{'lineWidth': 4},1,medium,[0.5],0
+1733346951.98,1733346951.98,Changed Line Width,,{'lineWidth': 5},1,medium,[0.5],0
+1733346952.013,1733346952.013,Changed Line Width,,{'lineWidth': 6},1,medium,[0.5],0
+1733346952.03,1733346952.03,Changed Line Width,,{'lineWidth': 7},1,medium,[0.5],0
+1733346952.063,1733346952.063,Changed Line Width,,{'lineWidth': 8},1,medium,[0.5],0
+1733346952.063,1733346952.063,Changed Line Width,,{'lineWidth': 9},1,medium,[0.5],0
+1733346952.096,1733346952.096,Changed Line Width,,{'lineWidth': 10},1,medium,[0.5],0
+1733346952.588,1733346952.588,Start Drawing,,{},1,medium,[0.5],0
+1733346953.091,1733346953.091,Continuous Drawing,,{'duration': 503},1,medium,[0.5],0
+1733346953.59,1733346953.59,Continuous Drawing,,{'duration': 1002},1,medium,[0.5],0
+1733346953.979,1733346953.979,Stop Drawing,,{'duration': 1391},1,medium,[0.5],0
+1733346954.799,1733346954.799,Changed Line Width,,{'lineWidth': 19},1,high,[0.9],1
+1733346954.749,1733346954.749,Changed Line Width,,{'lineWidth': 13},1,high,[0.9],0
+1733346954.782,1733346954.782,Changed Line Width,,{'lineWidth': 17},1,high,[0.9],0
+1733346954.866,1733346954.866,Changed Line Width,,{'lineWidth': 24},1,high,[0.9],0
+1733346954.866,1733346954.866,Changed Line Width,,{'lineWidth': 19},1,high,[0.9],0
+1733346954.866,1733346954.866,Changed Line Width,,{'lineWidth': 24},1,high,[0.9],0
+1733346954.866,1733346954.866,Changed Line Width,,{'lineWidth': 13},1,high,[0.9],0
+1733346954.866,1733346954.866,Changed Line Width,,{'lineWidth': 17},1,high,[0.9],0
+1733346954.732,1733346954.732,Changed Line Width,,{'lineWidth': 12},1,high,[0.9],1
+1733346954.832,1733346954.832,Changed Line Width,,{'lineWidth': 22},1,high,[0.9],0
+1733346954.866,1733346954.866,Changed Line Width,,{'lineWidth': 12},1,high,[0.9],0
+1733346954.816,1733346954.816,Changed Line Width,,{'lineWidth': 21},1,high,[0.9],0
+1733346954.849,1733346954.849,Changed Line Width,,{'lineWidth': 23},1,high,[0.9],0
+1733346954.866,1733346954.866,Changed Line Width,,{'lineWidth': 22},1,high,[0.9],0
+1733346954.766,1733346954.766,Changed Line Width,,{'lineWidth': 15},1,high,[0.9],1
+1733346954.866,1733346954.866,Changed Line Width,,{'lineWidth': 21},1,high,[0.9],1
+1733346954.866,1733346954.866,Changed Line Width,,{'lineWidth': 23},1,high,[0.9],1
+1733346954.866,1733346954.866,Changed Line Width,,{'lineWidth': 15},1,high,[0.9],1
+1733346954.716,1733346954.716,Changed Line Width,,{'lineWidth': 11},1,high,[0.9],1
+1733346954.866,1733346954.866,Changed Line Width,,{'lineWidth': 11},1,high,[0.9],1
+1733346955.764,1733346955.764,Reset Canvas,,{'resetCount': 1},1,high,[0.9],1
+1733346961.58,1733346961.58,Start Drawing,,{},1,high,[0.9],1
+1733346962.083,1733346962.083,Continuous Drawing,,{'duration': 503},1,high,[0.9],1
+1733346962.355,1733346962.355,Stop Drawing,,{'duration': 775},1,high,[0.9],1
+1733346964.084,1733346964.084,Reset Canvas,,{'resetCount': 2},1,high,[0.9],1
+1733346965.057,1733346965.057,Changed Line Width,,{'lineWidth': 22},1,medium,[0.5],0
+1733346965.141,1733346965.141,Changed Line Width,,{'lineWidth': 22},1,medium,[0.5],1
+1733346965.074,1733346965.074,Changed Line Width,,{'lineWidth': 21},1,medium,[0.5],1
+1733346965.191,1733346965.191,Changed Line Width,,{'lineWidth': 7},1,medium,[0.5],1
+1733346965.207,1733346965.207,Changed Line Width,,{'lineWidth': 4},1,medium,[0.5],0
+1733346965.207,1733346965.207,Changed Line Width,,{'lineWidth': 21},1,medium,[0.5],0
+1733346965.091,1733346965.091,Changed Line Width,,{'lineWidth': 18},1,medium,[0.5],0
+1733346965.207,1733346965.207,Changed Line Width,,{'lineWidth': 3},1,medium,[0.5],0
+1733346965.207,1733346965.207,Changed Line Width,,{'lineWidth': 6},1,medium,[0.5],0
+1733346965.107,1733346965.107,Changed Line Width,,{'lineWidth': 16},1,medium,[0.5],0
+1733346965.207,1733346965.207,Changed Line Width,,{'lineWidth': 18},1,medium,[0.5],0
+1733346965.207,1733346965.207,Changed Line Width,,{'lineWidth': 16},1,high,[0.9],1
+1733346965.124,1733346965.124,Changed Line Width,,{'lineWidth': 12},1,high,[0.9],0
+1733346965.141,1733346965.141,Changed Line Width,,{'lineWidth': 10},1,high,[0.9],0
+1733346965.207,1733346965.207,Changed Line Width,,{'lineWidth': 12},1,high,[0.9],0
+1733346965.207,1733346965.207,Changed Line Width,,{'lineWidth': 10},1,high,[0.9],0
+1733346966.116,1733346966.116,Start Drawing,,{},1,high,[0.9],0
+1733346966.619,1733346966.619,Continuous Drawing,,{'duration': 503},1,high,[0.9],0
+1733346967.116,1733346967.116,Continuous Drawing,,{'duration': 1000},1,high,[0.9],0
+1733346967.619,1733346967.619,Continuous Drawing,,{'duration': 1503},1,high,[0.9],0
+1733346968.131,1733346968.131,Stop Drawing,,{'duration': 2071},1,high,[0.9],0
+1733346968.131,1733346968.131,Continuous Drawing,,{'duration': 2015},1,high,[0.9],0
+1733346968.996,1733346968.996,Start Drawing,,{},1,high,[0.9],0
+1733346969.505,1733346969.505,Continuous Drawing,,{'duration': 509},1,high,[0.9],0
+1733346970.002,1733346970.002,Continuous Drawing,,{'duration': 1006},1,high,[0.9],0
+1733346970.502,1733346970.502,Continuous Drawing,,{'duration': 1506},1,high,[0.9],0
+1733346971.0,1733346971.0,Continuous Drawing,,{'duration': 2004},1,high,[0.9],0
+1733346965.04,1733346965.04,Changed Line Width,,{'lineWidth': 23},1,high,[0.9],0
+1733346971.504,1733346971.504,Changed Line Width,,{'lineWidth': 23},1,high,[0.9],0
+1733346971.504,1733346971.504,Continuous Drawing,,{'duration': 2508},1,high,[0.9],0
+1733346972.007,1733346972.007,Continuous Drawing,,{'duration': 3011},1,high,[0.9],0
+1733346972.496,1733346972.496,Continuous Drawing,,{'duration': 3500},1,high,[0.9],0
+1733346972.997,1733346972.997,Continuous Drawing,,{'duration': 4001},1,high,[0.9],0
+1733346973.497,1733346973.497,Continuous Drawing,,{'duration': 4501},1,high,[0.9],0
+1733346973.998,1733346973.998,Continuous Drawing,,{'duration': 5002},1,high,[0.9],0
+1733346974.501,1733346974.501,Continuous Drawing,,{'duration': 5505},1,high,[0.9],0
+1733346974.715,1733346974.715,Stop Drawing,,{'duration': 5719},1,high,[0.9],0
+1733346975.979,1733346975.979,Continuous Drawing,,{'duration': 503},1,medium,[0.5],1
+1733346975.979,1733346975.979,Continuous Drawing,,{'duration': 503},1,medium,[0.5],1
+1733346976.479,1733346976.479,Continuous Drawing,,{'duration': 1003},1,medium,[0.5],1
+1733346976.979,1733346976.979,Continuous Drawing,,{'duration': 1503},1,medium,[0.5],1
+1733346977.478,1733346977.478,Continuous Drawing,,{'duration': 2002},1,medium,[0.5],1
+1733346977.979,1733346977.979,Continuous Drawing,,{'duration': 2503},1,medium,[0.5],1
+1733346978.487,1733346978.487,Continuous Drawing,,{'duration': 3011},1,medium,[0.5],1
+1733346978.979,1733346978.979,Stop Drawing,,{'duration': 3503},1,medium,[0.5],1
+1733346979.66,1733346979.66,Start Drawing,,{},1,medium,[0.5],1
+1733346980.163,1733346980.163,Continuous Drawing,,{'duration': 503},1,medium,[0.5],1
+1733346980.669,1733346980.669,Continuous Drawing,,{'duration': 1009},1,medium,[0.5],1
+1733346981.17,1733346981.17,Continuous Drawing,,{'duration': 1510},1,medium,[0.5],1
+1733346975.476,1733346975.476,Start Drawing,,{},1,medium,[0.5],1
+1733346981.17,1733346981.17,Start Drawing,,{},1,medium,[0.5],1
+1733346981.666,1733346981.666,Continuous Drawing,,{'duration': 2006},1,medium,[0.5],1
+1733346982.169,1733346982.169,Continuous Drawing,,{'duration': 2509},1,medium,[0.5],1
+1733346982.664,1733346982.664,Continuous Drawing,,{'duration': 3004},1,medium,[0.5],1
+1733346983.027,1733346983.027,Stop Drawing,,{'duration': 3367},1,medium,[0.5],1
+1733346987.827,1733346987.827,Changed Color,,{'color': '#ffff00'},1,high,[0.9],1
+1733346987.827,1733346987.827,Changed Color,,{'color': '#ffff00'},1,high,[0.9],1
+1733346990.715,1733346990.715,Changed Color,,{'color': '#980000'},1,high,[0.9],1
+1733346992.371,1733346992.371,Start Drawing,,{},1,high,[0.9],1
+1733346992.875,1733346992.875,Continuous Drawing,,{'duration': 504},1,high,[0.9],1
+1733346993.375,1733346993.375,Continuous Drawing,,{'duration': 1004},1,high,[0.9],1
+1733346993.875,1733346993.875,Continuous Drawing,,{'duration': 1504},1,high,[0.9],1
+1733346994.373,1733346994.373,Continuous Drawing,,{'duration': 2002},1,high,[0.9],1
+1733346994.881,1733346994.881,Continuous Drawing,,{'duration': 2510},1,high,[0.9],1
+1733346995.379,1733346995.379,Continuous Drawing,,{'duration': 3008},1,high,[0.9],1
+1733346995.88,1733346995.88,Stop Drawing,,{'duration': 3784},1,high,[0.9],1
+1733346995.88,1733346995.88,Continuous Drawing,,{'duration': 3509},1,high,[0.9],1
+1733346996.932,1733346996.932,Start Drawing,,{},1,high,[0.9],1
+1733346997.441,1733346997.441,Continuous Drawing,,{'duration': 509},1,high,[0.9],1
+1733346998.434,1733346998.434,Continuous Drawing,,{'duration': 1502},1,medium,[0.5],0
+1733346998.434,1733346998.434,Continuous Drawing,,{'duration': 1502},1,medium,[0.5],0
+1733346998.935,1733346998.935,Continuous Drawing,,{'duration': 2003},1,medium,[0.5],0
+1733346997.936,1733346997.936,Continuous Drawing,,{'duration': 1004},1,medium,[0.5],0
+1733346998.935,1733346998.935,Continuous Drawing,,{'duration': 1004},1,medium,[0.5],0
+1733346999.435,1733346999.435,Continuous Drawing,,{'duration': 2503},1,medium,[0.5],0
+1733346999.933,1733346999.933,Continuous Drawing,,{'duration': 3001},1,medium,[0.5],0
+1733347000.435,1733347000.435,Continuous Drawing,,{'duration': 3503},1,medium,[0.5],0
+1733347000.933,1733347000.933,Continuous Drawing,,{'duration': 4001},1,medium,[0.5],0
+1733347001.434,1733347001.434,Continuous Drawing,,{'duration': 4502},1,medium,[0.5],0
+1733347001.934,1733347001.934,Continuous Drawing,,{'duration': 5002},1,medium,[0.5],0
+1733347002.437,1733347002.437,Continuous Drawing,,{'duration': 5505},1,medium,[0.5],0
+1733347002.934,1733347002.934,Continuous Drawing,,{'duration': 6002},1,medium,[0.5],0
+1733347003.435,1733347003.435,Continuous Drawing,,{'duration': 6503},1,medium,[0.5],0
+1733347003.939,1733347003.939,Continuous Drawing,,{'duration': 7007},1,medium,[0.5],0
+1733347004.434,1733347004.434,Continuous Drawing,,{'duration': 7502},1,medium,[0.5],0
+1733347004.94,1733347004.94,Continuous Drawing,,{'duration': 8008},1,medium,[0.5],0
+1733347005.434,1733347005.434,Continuous Drawing,,{'duration': 8502},1,medium,[0.5],0
+1733347005.938,1733347005.938,Continuous Drawing,,{'duration': 9006},1,medium,[0.5],0
+1733347006.441,1733347006.441,Continuous Drawing,,{'duration': 9509},1,medium,[0.5],0
+1733347006.944,1733347006.944,Continuous Drawing,,{'duration': 10012},1,medium,[0.5],0
+1733347007.441,1733347007.441,Continuous Drawing,,{'duration': 10509},1,medium,[0.5],0
+1733347008.434,1733347008.434,Continuous Drawing,,{'duration': 11502},1,high,[0.9],0
+1733347008.434,1733347008.434,Continuous Drawing,,{'duration': 11502},1,high,[0.9],0
+1733347007.937,1733347007.937,Continuous Drawing,,{'duration': 11005},1,high,[0.9],0
+1733347008.434,1733347008.434,Continuous Drawing,,{'duration': 11005},1,high,[0.9],0
+1733347008.843,1733347008.843,Stop Drawing,,{'duration': 11911},1,high,[0.9],0
+1733347016.084,1733347016.084,Changed Color,,{'color': '#00ff00'},1,high,[0.9],0
+1733347025.467,1733347025.467,Start Drawing,,{},1,high,[0.9],1
+1733347025.467,1733347025.467,Start Drawing,,{},1,high,[0.9],1
+1733347025.97,1733347025.97,Continuous Drawing,,{'duration': 503},1,high,[0.9],1
+1733347026.475,1733347026.475,Continuous Drawing,,{'duration': 1008},1,high,[0.9],1
+1733347026.975,1733347026.975,Continuous Drawing,,{'duration': 1508},1,high,[0.9],1
+1733347027.475,1733347027.475,Continuous Drawing,,{'duration': 2008},1,high,[0.9],1
+1733347027.975,1733347027.975,Continuous Drawing,,{'duration': 2508},1,high,[0.9],1
+1733347028.155,1733347028.155,Stop Drawing,,{'duration': 2688},1,high,[0.9],1
+1733347023.239,1733347023.239,Changed Color,,{'color': '#0c790c'},1,high,[0.9],1
+1733347028.155,1733347028.155,Changed Color,,{'color': '#0c790c'},1,high,[0.9],1
+1733347029.771,1733347029.771,Start Drawing,,{},1,high,[0.9],1
+1733347030.272,1733347030.272,Continuous Drawing,,{'duration': 501},1,high,[0.9],1
+1733347030.772,1733347030.772,Continuous Drawing,,{'duration': 1001},1,high,[0.9],1
+1733347031.273,1733347031.273,Continuous Drawing,,{'duration': 1502},1,high,[0.9],1
+1733347031.786,1733347031.786,Continuous Drawing,,{'duration': 2015},1,high,[0.9],1
+1733347032.272,1733347032.272,Continuous Drawing,,{'duration': 2501},1,high,[0.9],1
+1733347032.779,1733347032.779,Continuous Drawing,,{'duration': 3008},1,high,[0.9],1
+1733347033.772,1733347033.772,Continuous Drawing,,{'duration': 4001},1,medium,[0.5],1
+1733347033.772,1733347033.772,Continuous Drawing,,{'duration': 4001},1,medium,[0.5],1
+1733347034.284,1733347034.284,Continuous Drawing,,{'duration': 4513},1,medium,[0.5],1
+1733347034.547,1733347034.547,Stop Drawing,,{'duration': 4776},1,medium,[0.5],1
+1733347036.332,1733347036.332,Start Drawing,,{},1,medium,[0.5],1
+1733347036.833,1733347036.833,Continuous Drawing,,{'duration': 501},1,medium,[0.5],1
+1733347037.333,1733347037.333,Continuous Drawing,,{'duration': 1001},1,medium,[0.5],1
+1733347037.833,1733347037.833,Continuous Drawing,,{'duration': 1501},1,medium,[0.5],1
+1733347038.344,1733347038.344,Continuous Drawing,,{'duration': 2012},1,medium,[0.5],1
+1733347038.834,1733347038.834,Continuous Drawing,,{'duration': 2502},1,medium,[0.5],1
+1733347039.335,1733347039.335,Continuous Drawing,,{'duration': 3003},1,medium,[0.5],1
+1733347033.282,1733347033.282,Continuous Drawing,,{'duration': 3511},1,medium,[0.5],1
+1733347039.335,1733347039.335,Continuous Drawing,,{'duration': 3511},1,medium,[0.5],1
+1733347039.835,1733347039.835,Continuous Drawing,,{'duration': 3503},1,medium,[0.5],1
+1733347040.336,1733347040.336,Continuous Drawing,,{'duration': 4004},1,medium,[0.5],1
+1733347040.707,1733347040.707,Stop Drawing,,{'duration': 4375},1,medium,[0.5],1
+1733347042.323,1733347042.323,Start Drawing,,{},1,medium,[0.5],1
+1733347042.826,1733347042.826,Continuous Drawing,,{'duration': 503},1,medium,[0.5],1
+1733347043.419,1733347043.419,Stop Drawing,,{'duration': 1096},0,medium,[0.5],0
+1733347043.419,1733347043.419,Stop Drawing,,{'duration': 1096},0,medium,[0.5],0
+1733347043.326,1733347043.326,Continuous Drawing,,{'duration': 1003},1,medium,[0.5],0
+1733347043.419,1733347043.419,Continuous Drawing,,{'duration': 1003},1,medium,[0.5],0
+1733347044.443,1733347044.443,Start Drawing,,{},1,medium,[0.5],0
+1733347044.947,1733347044.947,Continuous Drawing,,{'duration': 504},1,medium,[0.5],0
+1733347045.445,1733347045.445,Continuous Drawing,,{'duration': 1002},1,medium,[0.5],0
+1733347045.555,1733347045.555,Stop Drawing,,{'duration': 1112},1,medium,[0.5],0
+1733347046.372,1733347046.372,Start Drawing,,{},1,medium,[0.5],0
+1733347046.827,1733347046.827,Stop Drawing,,{'duration': 455},1,medium,[0.5],0
+1733347047.291,1733347047.291,Start Drawing,,{},1,medium,[0.5],0
+1733347047.803,1733347047.803,Continuous Drawing,,{'duration': 512},1,medium,[0.5],0
+1733347047.875,1733347047.875,Stop Drawing,,{'duration': 584},1,medium,[0.5],0
+1733347048.379,1733347048.379,Start Drawing,,{},1,medium,[0.5],0
+1733347048.763,1733347048.763,Stop Drawing,,{'duration': 384},1,medium,[0.5],0
+1733347049.659,1733347049.659,Start Drawing,,{},1,medium,[0.5],0
+1733347050.175,1733347050.175,Continuous Drawing,,{'duration': 516},1,medium,[0.5],0
+1733347050.219,1733347050.219,Stop Drawing,,{'duration': 560},1,medium,[0.5],0
+1733347050.731,1733347050.731,Start Drawing,,{},1,medium,[0.5],0
+1733347051.17,1733347051.17,Stop Drawing,,{'duration': 439},1,medium,[0.5],0
+1733347051.731,1733347051.731,Start Drawing,,{},1,medium,[0.5],0
+1733347052.234,1733347052.234,Continuous Drawing,,{'duration': 503},1,medium,[0.5],0
+1733347052.507,1733347052.507,Stop Drawing,,{'duration': 776},1,medium,[0.5],0
+1733347058.691,1733347058.691,Changed Color,,{'color': '#ff00ff'},1,medium,[0.5],1
+1733347058.691,1733347058.691,Changed Color,,{'color': '#ff00ff'},1,medium,[0.5],1
+1733347066.765,1733347066.765,Start Drawing,,{},1,medium,[0.5],1
+1733347066.766,1733347066.766,Changed Color,,{'color': '#c007c0'},1,medium,[0.5],1
+1733347067.27,1733347067.27,Continuous Drawing,,{'duration': 505},1,medium,[0.5],1
+1733347067.474,1733347067.474,Stop Drawing,,{'duration': 709},1,medium,[0.5],1
+1733347067.9,1733347067.9,Start Drawing,,{},1,medium,[0.5],1
+1733347068.408,1733347068.408,Continuous Drawing,,{'duration': 508},1,medium,[0.5],1
+1733347068.562,1733347068.562,Stop Drawing,,{'duration': 662},1,medium,[0.5],1
+1733347071.107,1733347071.107,Continuous Drawing,,{'duration': 512},1,medium,[0.5],1
+1733347071.107,1733347071.107,Continuous Drawing,,{'duration': 512},1,medium,[0.5],1
+1733347071.114,1733347071.114,Stop Drawing,,{'duration': 519},1,medium,[0.5],1
+1733347072.235,1733347072.235,Start Drawing,,{},1,medium,[0.5],1
+1733347072.666,1733347072.666,Stop Drawing,,{'duration': 431},1,medium,[0.5],1
+1733347073.171,1733347073.171,Start Drawing,,{},1,medium,[0.5],1
+1733347073.579,1733347073.579,Stop Drawing,,{'duration': 408},1,medium,[0.5],1
+1733347074.139,1733347074.139,Start Drawing,,{},1,medium,[0.5],1
+1733347074.646,1733347074.646,Continuous Drawing,,{'duration': 507},1,medium,[0.5],1
+1733347074.73,1733347074.73,Stop Drawing,,{'duration': 591},1,medium,[0.5],1
+1733347076.163,1733347076.163,Start Drawing,,{},1,medium,[0.5],1
+1733347076.671,1733347076.671,Continuous Drawing,,{'duration': 508},1,medium,[0.5],1
+1733347076.802,1733347076.802,Stop Drawing,,{'duration': 639},1,medium,[0.5],1
+1733347077.411,1733347077.411,Start Drawing,,{},1,medium,[0.5],1
+1733347077.898,1733347077.898,Stop Drawing,,{'duration': 487},1,medium,[0.5],1
+1733347078.419,1733347078.419,Start Drawing,,{},1,medium,[0.5],1
+1733347078.92,1733347078.92,Continuous Drawing,,{'duration': 501},1,medium,[0.5],1
+1733347079.074,1733347079.074,Stop Drawing,,{'duration': 655},1,medium,[0.5],1
+1733347070.595,1733347070.595,Start Drawing,,{},1,medium,[0.5],1
+1733347079.074,1733347079.074,Start Drawing,,{},1,medium,[0.5],1
+1733347081.163,1733347081.163,Stop Drawing,,{'duration': 480},0,medium,[0.5],1
+1733347081.163,1733347081.163,Stop Drawing,,{'duration': 480},0,medium,[0.5],1
+1733347080.683,1733347080.683,Start Drawing,,{},1,medium,[0.5],1
+1733347081.163,1733347081.163,Start Drawing,,{},1,medium,[0.5],1
+1733347082.195,1733347082.195,Start Drawing,,{},1,medium,[0.5],1
+1733347082.7,1733347082.7,Continuous Drawing,,{'duration': 505},1,medium,[0.5],1
+1733347082.731,1733347082.731,Stop Drawing,,{'duration': 536},1,medium,[0.5],1
+1733347083.299,1733347083.299,Start Drawing,,{},1,medium,[0.5],1
+1733347083.8,1733347083.8,Continuous Drawing,,{'duration': 501},1,medium,[0.5],1
+1733347083.986,1733347083.986,Stop Drawing,,{'duration': 687},1,medium,[0.5],1
+1733347100.739,1733347100.739,Start Drawing,,{},1,high,[0.9],0
+1733347100.739,1733347100.739,Start Drawing,,{},1,high,[0.9],0
+1733347101.246,1733347101.246,Continuous Drawing,,{'duration': 507},1,high,[0.9],0
+1733347101.746,1733347101.746,Continuous Drawing,,{'duration': 1007},1,high,[0.9],0
+1733347102.242,1733347102.242,Continuous Drawing,,{'duration': 1503},1,high,[0.9],0
+1733347102.74,1733347102.74,Continuous Drawing,,{'duration': 2001},1,high,[0.9],0
+1733347103.245,1733347103.245,Continuous Drawing,,{'duration': 2506},1,high,[0.9],0
+1733347103.745,1733347103.745,Continuous Drawing,,{'duration': 3006},1,high,[0.9],0
+1733347104.244,1733347104.244,Continuous Drawing,,{'duration': 3505},1,high,[0.9],0
+1733347098.219,1733347098.219,Changed Color,,{'color': '#ff0000'},1,high,[0.9],0
+1733347104.244,1733347104.244,Changed Color,,{'color': '#ff0000'},1,high,[0.9],0
+1733347104.743,1733347104.743,Continuous Drawing,,{'duration': 4004},1,high,[0.9],0
+1733347105.239,1733347105.239,Continuous Drawing,,{'duration': 4500},1,high,[0.9],0
+1733347105.741,1733347105.741,Continuous Drawing,,{'duration': 5002},1,high,[0.9],0
+1733347106.24,1733347106.24,Continuous Drawing,,{'duration': 5501},1,high,[0.9],0
+1733347106.752,1733347106.752,Continuous Drawing,,{'duration': 6013},1,high,[0.9],0
+1733347107.253,1733347107.253,Continuous Drawing,,{'duration': 6514},1,high,[0.9],0
+1733347107.751,1733347107.751,Continuous Drawing,,{'duration': 7012},1,high,[0.9],0
+1733347108.742,1733347108.742,Continuous Drawing,,{'duration': 8003},1,high,[0.9],1
+1733347108.742,1733347108.742,Continuous Drawing,,{'duration': 8003},1,high,[0.9],1
+1733347109.239,1733347109.239,Continuous Drawing,,{'duration': 8500},1,high,[0.9],1
+1733347109.739,1733347109.739,Continuous Drawing,,{'duration': 9000},1,high,[0.9],1
+1733347110.042,1733347110.042,Stop Drawing,,{'duration': 9303},1,high,[0.9],1
+1733347112.619,1733347112.619,Changed Color,,{'color': '#000000'},1,high,[0.9],1
+1733347113.906,1733347113.906,Start Drawing,,{},1,high,[0.9],1
+1733347108.253,1733347108.253,Continuous Drawing,,{'duration': 7514},1,high,[0.9],1
+1733347113.906,1733347113.906,Continuous Drawing,,{'duration': 7514},1,high,[0.9],1
+1733347114.41,1733347114.41,Continuous Drawing,,{'duration': 504},1,high,[0.9],1
+1733347114.91,1733347114.91,Continuous Drawing,,{'duration': 1004},1,high,[0.9],1
+1733347115.41,1733347115.41,Continuous Drawing,,{'duration': 1504},1,high,[0.9],1
+1733347115.913,1733347115.913,Stop Drawing,,{'duration': 2096},1,high,[0.9],1
+1733347115.913,1733347115.913,Continuous Drawing,,{'duration': 2007},1,high,[0.9],1
+1733347116.49,1733347116.49,Start Drawing,,{},1,high,[0.9],1
+1733347116.994,1733347116.994,Continuous Drawing,,{'duration': 504},1,high,[0.9],1
+1733347117.298,1733347117.298,Stop Drawing,,{'duration': 808},1,high,[0.9],1
+1733347119.718,1733347119.718,Continuous Drawing,,{'duration': 508},1,medium,[0.5],0
+1733347119.718,1733347119.718,Continuous Drawing,,{'duration': 508},1,medium,[0.5],0
+1733347120.218,1733347120.218,Continuous Drawing,,{'duration': 1008},1,medium,[0.5],0
+1733347120.719,1733347120.719,Continuous Drawing,,{'duration': 1509},1,medium,[0.5],0
+1733347121.218,1733347121.218,Continuous Drawing,,{'duration': 2008},1,medium,[0.5],0
+1733347121.72,1733347121.72,Continuous Drawing,,{'duration': 2510},1,medium,[0.5],0
+1733347121.826,1733347121.826,Stop Drawing,,{'duration': 2616},1,medium,[0.5],0
+1733347122.835,1733347122.835,Start Drawing,,{},1,medium,[0.5],0
+1733347123.338,1733347123.338,Continuous Drawing,,{'duration': 503},1,medium,[0.5],0
+1733347123.841,1733347123.841,Stop Drawing,,{'duration': 1063},1,medium,[0.5],0
+1733347123.841,1733347123.841,Continuous Drawing,,{'duration': 1006},1,medium,[0.5],0
+1733347119.21,1733347119.21,Start Drawing,,{},1,medium,[0.5],0
+1733347123.841,1733347123.841,Start Drawing,,{},1,medium,[0.5],0
+1733347132.844,1733347132.844,Continuous Drawing,,{'duration': 504},1,medium,[0.5],1
+1733347132.844,1733347132.844,Continuous Drawing,,{'duration': 504},1,medium,[0.5],1
+1733347133.345,1733347133.345,Continuous Drawing,,{'duration': 1005},1,medium,[0.5],1
+1733347133.841,1733347133.841,Continuous Drawing,,{'duration': 1501},1,medium,[0.5],1
+1733347134.074,1733347134.074,Stop Drawing,,{'duration': 1734},1,medium,[0.5],1
+1733347135.603,1733347135.603,Start Drawing,,{},1,medium,[0.5],1
+1733347136.114,1733347136.114,Continuous Drawing,,{'duration': 511},1,medium,[0.5],1
+1733347136.617,1733347136.617,Continuous Drawing,,{'duration': 1014},1,medium,[0.5],1
+1733347136.762,1733347136.762,Stop Drawing,,{'duration': 1159},1,medium,[0.5],1
+1733347137.907,1733347137.907,Start Drawing,,{},1,medium,[0.5],1
+1733347138.41,1733347138.41,Continuous Drawing,,{'duration': 503},1,medium,[0.5],1
+1733347132.34,1733347132.34,Start Drawing,,{},1,medium,[0.5],1
+1733347138.41,1733347138.41,Start Drawing,,{},1,medium,[0.5],1
+1733347138.913,1733347138.913,Continuous Drawing,,{'duration': 1006},1,medium,[0.5],1
+1733347138.954,1733347138.954,Stop Drawing,,{'duration': 1047},1,medium,[0.5],1
+1733347152.235,1733347152.235,Start Drawing,,{},1,high,[0.9],1
+1733347152.235,1733347152.235,Start Drawing,,{},1,high,[0.9],1
+1733347152.746,1733347152.746,Continuous Drawing,,{'duration': 511},1,high,[0.9],1
+1733347153.246,1733347153.246,Continuous Drawing,,{'duration': 1011},1,high,[0.9],1
+1733347153.514,1733347153.514,Stop Drawing,,{'duration': 1279},1,high,[0.9],1
+1733347155.387,1733347155.387,Switched to Erase,,{},1,high,[0.9],1
+1733347150.347,1733347150.347,Changed Color,,{'color': '#ffff00'},1,high,[0.9],1
+1733347155.387,1733347155.387,Changed Color,,{'color': '#ffff00'},1,high,[0.9],1
+1733347156.93,1733347156.93,Changed Line Width,,{'lineWidth': 4},1,high,[0.9],1
+1733347157.116,1733347157.116,Changed Line Width,,{'lineWidth': 5},1,high,[0.9],1
+1733347157.116,1733347157.116,Changed Line Width,,{'lineWidth': 6},1,high,[0.9],1
+1733347158.106,1733347158.106,Start Drawing,,{},1,high,[0.9],1
+1733347158.616,1733347158.616,Continuous Drawing,,{'duration': 510},1,high,[0.9],1
+1733347158.906,1733347158.906,Stop Drawing,,{'duration': 800},1,high,[0.9],1
+1733347159.202,1733347159.202,Start Drawing,,{},1,high,[0.9],1
+1733347159.698,1733347159.698,Stop Drawing,,{'duration': 496},1,high,[0.9],1
+1733347173.853,1733347173.853,Changed Color,,{'color': '#d7d728'},1,medium,[0.5],0
+1733347173.853,1733347173.853,Start Drawing,,{},1,medium,[0.5],0
+1733347173.946,1733347173.946,Changed Color,,{'color': '#d7d728'},1,medium,[0.5],0
+1733347173.946,1733347173.946,Start Drawing,,{},1,medium,[0.5],0
+1733347175.074,1733347175.074,Start Drawing,,{},1,medium,[0.5],0
+1733347175.577,1733347175.577,Continuous Drawing,,{'duration': 503},1,medium,[0.5],0
+1733347176.076,1733347176.076,Continuous Drawing,,{'duration': 1002},1,medium,[0.5],0
+1733347176.577,1733347176.577,Continuous Drawing,,{'duration': 1503},1,medium,[0.5],0
+1733347177.058,1733347177.058,Stop Drawing,,{'duration': 1984},1,medium,[0.5],0
+1733347177.57,1733347177.57,Start Drawing,,{},1,medium,[0.5],0
+1733347177.93,1733347177.93,Stop Drawing,,{'duration': 360},1,medium,[0.5],0
+1733347179.082,1733347179.082,Switched to Paint,,{},1,medium,[0.5],0
+1733347173.946,1733347173.946,Stop Drawing,,{'duration': 93},0,medium,[0.5],0
+1733347179.082,1733347179.082,Stop Drawing,,{'duration': 93},0,medium,[0.5],0
+1733347180.354,1733347180.354,Start Drawing,,{},0,medium,[0.5],0
+1733347180.857,1733347180.857,Continuous Drawing,,{'duration': 503},0,medium,[0.5],0
+1733347181.369,1733347181.369,Continuous Drawing,,{'duration': 1015},0,medium,[0.5],0
+1733347181.869,1733347181.869,Continuous Drawing,,{'duration': 1515},0,medium,[0.5],0
+1733347182.364,1733347182.364,Continuous Drawing,,{'duration': 2010},0,medium,[0.5],0
+1733347182.442,1733347182.442,Stop Drawing,,{'duration': 2088},0,medium,[0.5],0
+1733347183.434,1733347183.434,Start Drawing,,{},0,medium,[0.5],0
+1733347183.938,1733347183.938,Continuous Drawing,,{'duration': 504},0,medium,[0.5],0
+1733347184.945,1733347184.945,Continuous Drawing,,{'duration': 1511},1,medium,[0.5],1
+1733347184.945,1733347184.945,Continuous Drawing,,{'duration': 1511},1,medium,[0.5],1
+1733347185.444,1733347185.444,Continuous Drawing,,{'duration': 2010},1,medium,[0.5],1
+1733347185.666,1733347185.666,Stop Drawing,,{'duration': 2232},1,medium,[0.5],1
+1733347187.043,1733347187.043,Start Drawing,,{},1,medium,[0.5],1
+1733347187.551,1733347187.551,Continuous Drawing,,{'duration': 508},1,medium,[0.5],1
+1733347187.658,1733347187.658,Stop Drawing,,{'duration': 615},1,medium,[0.5],1
+1733347188.178,1733347188.178,Start Drawing,,{},1,medium,[0.5],1
+1733347188.658,1733347188.658,Stop Drawing,,{'duration': 480},1,medium,[0.5],1
+1733347189.634,1733347189.634,Start Drawing,,{},1,medium,[0.5],1
+1733347190.01,1733347190.01,Stop Drawing,,{'duration': 376},1,medium,[0.5],1
+1733347190.69,1733347190.69,Start Drawing,,{},1,medium,[0.5],1
+1733347184.439,1733347184.439,Continuous Drawing,,{'duration': 1005},1,medium,[0.5],1
+1733347190.69,1733347190.69,Continuous Drawing,,{'duration': 1005},1,medium,[0.5],1
+1733347191.129,1733347191.129,Stop Drawing,,{'duration': 439},1,medium,[0.5],1
+1733347191.754,1733347191.754,Start Drawing,,{},1,medium,[0.5],1
+1733347192.122,1733347192.122,Stop Drawing,,{'duration': 368},1,medium,[0.5],1
+1733347192.626,1733347192.626,Start Drawing,,{},1,medium,[0.5],1
+1733347193.122,1733347193.122,Stop Drawing,,{'duration': 496},1,medium,[0.5],1
+1733347193.762,1733347193.762,Start Drawing,,{},1,medium,[0.5],1
+1733347194.154,1733347194.154,Stop Drawing,,{'duration': 392},1,medium,[0.5],1
+1733347195.05,1733347195.05,Stop Drawing,,{'duration': 328},0,medium,[0.5],0
+1733347195.05,1733347195.05,Stop Drawing,,{'duration': 328},0,medium,[0.5],0
+1733347194.722,1733347194.722,Start Drawing,,{},1,medium,[0.5],0
+1733347195.05,1733347195.05,Start Drawing,,{},1,medium,[0.5],0
+1733347195.746,1733347195.746,Start Drawing,,{},1,medium,[0.5],0
+1733347196.098,1733347196.098,Stop Drawing,,{'duration': 352},1,medium,[0.5],0
+1733347196.602,1733347196.602,Start Drawing,,{},1,medium,[0.5],0
+1733347197.111,1733347197.111,Continuous Drawing,,{'duration': 509},1,medium,[0.5],0
+1733347197.362,1733347197.362,Stop Drawing,,{'duration': 760},1,medium,[0.5],0
+1733347199.467,1733347199.467,Start Drawing,,{},1,medium,[0.5],0
+1733347199.968,1733347199.968,Continuous Drawing,,{'duration': 501},1,medium,[0.5],0
+1733347200.469,1733347200.469,Continuous Drawing,,{'duration': 1002},1,medium,[0.5],0
+1733347200.969,1733347200.969,Continuous Drawing,,{'duration': 1502},1,medium,[0.5],0
+1733347201.469,1733347201.469,Continuous Drawing,,{'duration': 2002},1,medium,[0.5],0
+1733347201.968,1733347201.968,Continuous Drawing,,{'duration': 2501},1,medium,[0.5],0
+1733347202.469,1733347202.469,Continuous Drawing,,{'duration': 3002},1,medium,[0.5],0
+1733347202.968,1733347202.968,Continuous Drawing,,{'duration': 3501},1,medium,[0.5],0
+1733347203.471,1733347203.471,Continuous Drawing,,{'duration': 4004},1,medium,[0.5],0
+1733347203.969,1733347203.969,Continuous Drawing,,{'duration': 4502},1,medium,[0.5],0
+1733347204.482,1733347204.482,Continuous Drawing,,{'duration': 5015},1,medium,[0.5],0
+1733347205.467,1733347205.467,Continuous Drawing,,{'duration': 6000},1,high,[0.9],1
+1733347205.467,1733347205.467,Continuous Drawing,,{'duration': 6000},1,high,[0.9],1
+1733347205.969,1733347205.969,Continuous Drawing,,{'duration': 6502},1,high,[0.9],1
+1733347204.973,1733347204.973,Continuous Drawing,,{'duration': 5506},1,high,[0.9],1
+1733347205.969,1733347205.969,Continuous Drawing,,{'duration': 5506},1,high,[0.9],1
+1733347206.469,1733347206.469,Continuous Drawing,,{'duration': 7002},1,high,[0.9],1
+1733347206.968,1733347206.968,Continuous Drawing,,{'duration': 7501},1,high,[0.9],1
+1733347207.469,1733347207.469,Continuous Drawing,,{'duration': 8002},1,high,[0.9],1
+1733347207.969,1733347207.969,Continuous Drawing,,{'duration': 8502},1,high,[0.9],1
+1733347208.482,1733347208.482,Continuous Drawing,,{'duration': 9015},1,high,[0.9],1
+1733347208.975,1733347208.975,Continuous Drawing,,{'duration': 9508},1,high,[0.9],1
+1733347209.476,1733347209.476,Continuous Drawing,,{'duration': 10009},1,high,[0.9],1
+1733347209.969,1733347209.969,Continuous Drawing,,{'duration': 10502},1,high,[0.9],1
+1733347210.473,1733347210.473,Continuous Drawing,,{'duration': 11006},1,high,[0.9],1
+1733347210.977,1733347210.977,Continuous Drawing,,{'duration': 11510},1,high,[0.9],1
+1733347211.473,1733347211.473,Continuous Drawing,,{'duration': 12006},1,high,[0.9],1
+1733347211.975,1733347211.975,Continuous Drawing,,{'duration': 12508},1,high,[0.9],1
+1733347212.33,1733347212.33,Stop Drawing,,{'duration': 12863},1,high,[0.9],1
